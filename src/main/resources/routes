@@ -1,0 +1,23 @@
+# Home page
+GET     /noqueue/v1/users                       controllers.ClientController.listUsers
+POST    /noqueue/v1/users                       controllers.ClientController.addUser
+DELETE  /noqueue/v1/users/:id            controllers.ClientController.deleteUser(id : Long)
+GET     /noqueue/v1/users/:id                   controllers.ClientController.retrieveUser(id: Long)
+PATCH  /noqueue/v1/users/:id                   controllers.ClientController.patchUser(id: Long)
+
+## Restaurants endpoints
+GET     /noqueue/v1/restaurants                       controllers.RestaurantController.listRestaurants
+POST    /noqueue/v1/restaurants                       controllers.RestaurantController.addRestaurant
+DELETE  /noqueue/v1/restaurants/:id            controllers.RestaurantController.deleteRestaurant(id : Long)
+GET     /noqueue/v1/restaurants/:id                   controllers.RestaurantController.retrieveRestaurant(id: Long)
+PATCH  /noqueue/v1/restaurants/:id                   controllers.RestaurantController.patchRestaurant(id: Long)
+
+## Rest Users points
+GET     /noqueue/v1/rest-users                       controllers.RestUserController.listRestUsers
+POST    /noqueue/v1/rest-users                       controllers.RestUserController.addRestUser
+DELETE  /noqueue/v1/rest-users/:id            controllers.RestUserController.deleteRestUser(id : Long)
+GET     /noqueue/v1/rest-users/:id                   controllers.RestUserController.retrieveRestUser(id: Long)
+PATCH  /noqueue/v1/rest-users/:id                   controllers.RestUserController.patchRestUser(id: Long)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
