@@ -24,8 +24,8 @@ case class Restaurant(id: Option[Long],
                       country: Option[String],
                       phoneNumber: Option[String],
                       restaurantId: Option[Long],
-                      latitude: Option[Long],
-                      longitude: Option[Long],
+                      latitude: Option[Float],
+                      longitude: Option[Float],
                       createdTimestamp: Option[DateTime],
                       deleted: Boolean)
 
@@ -37,8 +37,8 @@ case class RestaurantOutbound(id: Option[Long],
                               city: Option[String],
                               country: Option[String],
                               phoneNumber: Option[String],
-                              latitude: Option[Long],
-                              longitude: Option[Long],
+                              latitude: Option[Float],
+                              longitude: Option[Float],
                               createdTimestamp: Option[DateTime])
 
 case class RestaurantFormData(firstName: String, lastName: String, mobile: String, email: String)
@@ -54,15 +54,6 @@ object RestaurantForm {
     )(RestaurantFormData.apply)(RestaurantFormData.unapply)
   )
 }
-
-//object DateTimeMapper {
-//
-//  implicit def date2dateTime = MappedColumnType.base[DateTime, Date](
-//    dateTime => new Date(dateTime.getMillis),
-//    date => new DateTime(date)
-//  )
-//
-//}
 
 class RestaurantTableDef(tag: Tag) extends Table[Restaurant](tag, "sucursal") {
 
@@ -84,9 +75,9 @@ class RestaurantTableDef(tag: Tag) extends Table[Restaurant](tag, "sucursal") {
 
   def restaurantId = column[Option[Long]]("restaurant_id")
 
-  def latitude = column[Option[Long]]("latitude")
+  def latitude = column[Option[Float]]("latitude")
 
-  def longitude = column[Option[Long]]("longitude")
+  def longitude = column[Option[Float]]("longitud")
 
   def createdTimestamp = column[Option[DateTime]]("created_timestamp")
 

@@ -1,7 +1,7 @@
 package controllers
 
 import formatter.{Error, ErrorFormatter, UserFormatter, UserInbound}
-import model.User
+//import model.User
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
 
@@ -36,7 +36,7 @@ class ClientController extends Controller {
 
         resultVal.asOpt.map { userInboud =>
 
-          val newUser = User(
+          val newUser = model.User(
             None,
             userInboud.firstName,
             userInboud.lastName,
@@ -80,8 +80,8 @@ class ClientController extends Controller {
 
         resultVal.asOpt.map { userInboud =>
 
-          val patchUser = User(
-            None,
+          val patchUser = model.User(
+            Some(id),
             userInboud.firstName,
             userInboud.lastName,
             userInboud.mobile,

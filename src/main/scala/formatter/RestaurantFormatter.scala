@@ -15,8 +15,8 @@ case class RestaurantInbound(id: Option[Long],
                              country: Option[String],
                              phoneNumber: Option[String],
                              restaurantId: Option[Long],
-                             latitude: Option[Long],
-                             longitude: Option[Long],
+                             latitude: Option[Float],
+                             longitude: Option[Float],
                              createdTimestamp: Option[DateTime])
 
 object RestaurantFormatter {
@@ -43,8 +43,8 @@ object RestaurantFormatter {
       (JsPath \ "country").readNullable[String] and
       (JsPath \ "phone_number").readNullable[String] and
       (JsPath \ "restaurant_id").readNullable[Long] and
-      (JsPath \ "latitude").readNullable[Long] and
-      (JsPath \ "longitude").readNullable[Long] and
+      (JsPath \ "latitude").readNullable[Float] and
+      (JsPath \ "longitude").readNullable[Float] and
       (JsPath \ "created_timestamp").readNullable[DateTime](jodaDateReads)
     )(RestaurantInbound.apply _)
 
@@ -57,8 +57,8 @@ object RestaurantFormatter {
       (JsPath \ "city").writeNullable[String] and
       (JsPath \ "country").writeNullable[String] and
       (JsPath \ "phone_number").writeNullable[String] and
-      (JsPath \ "latitude").writeNullable[Long] and
-      (JsPath \ "longitude").writeNullable[Long] and
+      (JsPath \ "latitude").writeNullable[Float] and
+      (JsPath \ "longitude").writeNullable[Float] and
       (JsPath \ "created_timestamp").writeNullable[DateTime](jodaDateWrites)
     )(unlift(RestaurantOutbound.unapply))
 }

@@ -56,7 +56,7 @@ class RestaurantController extends Controller {
             Created(Json.toJson(user))
           }
         } getOrElse {
-          Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "new error"))))
+          Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "Validation of the json file failed."))))
         }
     } getOrElse {
       Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "Error"))))
@@ -64,7 +64,7 @@ class RestaurantController extends Controller {
   }
 
   def deleteRestaurant(id: Long) = Action.async { implicit request =>
-    ClientFacade.deleteUser(id)
+    RestaurantFacade.deleteRestaurant(id)
     Future(NoContent)
   }
 
@@ -88,7 +88,7 @@ class RestaurantController extends Controller {
         resultVal.asOpt.map { restaurantInboud =>
 
           val patchRestaurant = Restaurant(
-            None,
+            Some(id),
             restaurantInboud.address1,
             restaurantInboud.address2,
             restaurantInboud.zipCode,

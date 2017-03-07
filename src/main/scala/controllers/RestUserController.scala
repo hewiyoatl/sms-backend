@@ -83,7 +83,7 @@ class RestUserController extends Controller {
         resultVal.asOpt.map { restUserInboud =>
 
           val patchRestUser = RestUser(
-            None,
+            Some(id),
             restUserInboud.sucursalId,
             restUserInboud.firstName,
             restUserInboud.lastName,

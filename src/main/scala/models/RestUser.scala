@@ -46,7 +46,7 @@ class RestUserTableDef(tag: Tag) extends Table[RestUser](tag, "rest_user") {
 
   def sucursalId = column[Option[Long]]("sucursal_id")
 
-  def firstName = column[Option[String]]("last_name")
+  def firstName = column[Option[String]]("first_name")
 
   def lastName = column[Option[String]]("last_name")
 

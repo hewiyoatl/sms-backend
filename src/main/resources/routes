@@ -19,5 +19,17 @@ DELETE  /noqueue/v1/rest-users/:id            controllers.RestUserController.del
 GET     /noqueue/v1/rest-users/:id                   controllers.RestUserController.retrieveRestUser(id: Long)
 PATCH  /noqueue/v1/rest-users/:id                   controllers.RestUserController.patchRestUser(id: Long)
 
+## Reservation endpoints
+GET     /noqueue/v1/reservations                       controllers.ReservationController.listReservations(location: Option[Long])
+POST    /noqueue/v1/reservations                       controllers.ReservationController.addReservation
+DELETE  /noqueue/v1/reservations/:id            controllers.ReservationController.deleteReservation(id : Long)
+GET     /noqueue/v1/reservations/:id                   controllers.ReservationController.retrieveReservation(id: Long)
+PATCH  /noqueue/v1/reservations/:id                   controllers.ReservationController.patchReservation(id: Long)
+
+# Home page
+GET     /                           controllers.Application.index
+GET     /callback                   controllers.Callback.callback(code: Option[String])
+GET     /user                       controllers.User.index
+
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

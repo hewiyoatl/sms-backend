@@ -1,12 +1,12 @@
 package controllers
 
-import model.{User, UserOutbound, Users}
+import model.{UserOutbound, Users}
 
 import scala.concurrent.Future
 
 object ClientFacade {
 
-  def addUser(user: User): Future[Option[UserOutbound]] = {
+  def addUser(user: model.User): Future[Option[UserOutbound]] = {
     Users.add(user)
   }
 
@@ -22,7 +22,7 @@ object ClientFacade {
     Users.retrieveUser(id)
   }
 
-  def patchUser(user: User): Future[Option[UserOutbound]] = {
+  def patchUser(user: model.User): Future[Option[UserOutbound]] = {
     Users.patchUser(user)
   }
 
