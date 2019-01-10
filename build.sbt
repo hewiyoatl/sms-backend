@@ -34,11 +34,14 @@ resolvers += "Rocketlawyer Releases" at "http://f1tst-linbld100/nexus/content/re
 
 libraryDependencies ++= Seq(
   ws,
-  jdbc,
-  "org.postgresql" % "postgresql" % "9.4.1209",
   filters,
-  cache,
-  "com.typesafe.play" %% "anorm" % "2.5.0",
+  jdbc,
+  guice,
+  ehcache,
+  "org.playframework.anorm" %% "anorm" % "2.6.1",
+  "org.postgresql" % "postgresql" % "9.4.1209",
+  //"io.swagger" %% "swagger-play2" % "1.6.0",
+  //"com.typesafe.play" %% "anorm" % "2.5.0",
   //"org.scalaz" %% "scalaz-core" % "7.1.1",
   //"org.apache.kafka" % "kafka_2.11" % "0.9.0.0",
   //"net.cakesolutions" %% "scala-kafka-client" % "0.9.0.0",
@@ -51,11 +54,12 @@ libraryDependencies ++= Seq(
   "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
   "io.prometheus" % "simpleclient_servlet" % "0.0.16",
   "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
-  specs2 % Test,
   "com.aspose" % "words" % "14.3.0",
-  "com.typesafe.play" %% "play-slick" % "2.0.0",
+  specs2 % Test,
+  "com.typesafe.play" %% "play-slick" % "3.0.0",
   "mysql" % "mysql-connector-java" % "5.1.34",
-  "de.leanovate.play-mockws" %% "play-mockws" % "2.5.0" % "test")
+  //"org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
+  "de.leanovate.play-mockws" %% "play-mockws" % "2.6.2" % Test)
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 

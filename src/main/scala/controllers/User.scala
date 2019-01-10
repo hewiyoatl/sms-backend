@@ -1,17 +1,27 @@
 package controllers
 
-import play.api.Play.current
-import play.api.cache.Cache
+import javax.inject.Inject
+import play.api.Configuration
 import play.api.libs.json._
-import play.api.mvc.{Action, Controller, _}
+import play.api.libs.ws.WSClient
+import play.api.mvc.{Action, _}
+import play.api.cache.SyncCacheApi
 
-class User extends Controller {
+import scala.concurrent.ExecutionContext
+
+class User @Inject()(cc: ControllerComponents)
+                    (implicit context: ExecutionContext,
+                     config: Configuration,
+                     metrics: MetricsFacade,
+                     wsClient: WSClient,
+                     env: play.api.Environment,
+                     cache: SyncCacheApi) extends AbstractController(cc) {
 
   def AuthenticatedAction(f: Request[AnyContent] => Result): Action[AnyContent] = {
 
     Action { request =>
       (request.session.get("idToken").flatMap { idToken =>
-        Cache.getAs[JsValue](idToken + "profile")
+        cache.get[JsValue](idToken + "profile")
       } map { profile =>
         f(request)
       }).orElse {
@@ -21,9 +31,8 @@ class User extends Controller {
   }
 
   def index = AuthenticatedAction { request =>
-
     val idToken = request.session.get("idToken").get
-    val profile = Cache.getAs[JsValue](idToken + "profile").get
+    val profile = cache.get[JsValue](idToken + "profile").get
     Ok(views.html.user(profile))
   }
 }

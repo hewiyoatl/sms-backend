@@ -1,14 +1,20 @@
 package controllers
 
 import formatter._
+import javax.inject.Inject
 import models.Restaurant
+import play.api.db.Database
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class RestaurantController extends Controller {
+
+class RestaurantController @Inject()(cc: ControllerComponents)
+                                    (implicit context: ExecutionContext,
+                                     database: Database,
+                                     metrics: MetricsFacade) extends AbstractController(cc) {
 
   implicit val restaurantReader = RestaurantFormatter.RestaurantReader
 

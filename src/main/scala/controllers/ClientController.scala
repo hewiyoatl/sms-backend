@@ -1,14 +1,25 @@
 package controllers
 
 import formatter.{Error, ErrorFormatter, UserFormatter, UserInbound}
-//import model.User
+import javax.inject.Inject
+import play.api.Configuration
+import play.api.cache.SyncCacheApi
+import play.api.libs.ws.WSClient
+
+import scala.concurrent.ExecutionContext
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ClientController extends Controller {
+class ClientController @Inject()(cc: ControllerComponents)
+                                (implicit context: ExecutionContext,
+                                 config: Configuration,
+                                 metrics: MetricsFacade,
+                                 wsClient: WSClient,
+                                 env: play.api.Environment,
+                                 cache: SyncCacheApi) extends AbstractController(cc) {
 
   implicit val userReader = UserFormatter.UserReader
 
