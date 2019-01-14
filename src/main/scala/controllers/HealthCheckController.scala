@@ -2,18 +2,20 @@ package controllers
 
 import java.util
 import java.util.Map.Entry
-import javax.inject.Inject
 
 import com.codahale.metrics.health.HealthCheck.Result
 import com.codahale.metrics.health.HealthCheckRegistry
-import com.kenshoo.play.metrics.{MetricsDisabledException}
+import com.kenshoo.play.metrics.MetricsDisabledException
 import healthcheks.DatabaseHealthCheck
-import io.prometheus.client.{CollectorRegistry}
+import io.prometheus.client.CollectorRegistry
 import io.swagger.annotations._
+import javax.inject.Inject
 import play.api.Logger
+import play.api.db._
 import play.api.http.ContentTypes
 import play.api.mvc._
-import play.api.db._
+
+import scala.concurrent.ExecutionContext
 
 /**
  * Class to provide all the health checks related operations
@@ -22,7 +24,10 @@ import play.api.db._
  * @param metrics
  */
 @Api(value = "/health-check", protocols = "http, https")
-class HealthCheckController @Inject()(database: Database, metrics: MetricsFacade) extends Controller {
+class HealthCheckController @Inject()(cc: ControllerComponents)
+                                     (implicit context: ExecutionContext,
+                                      database: Database,
+                                      metrics: MetricsFacade) extends AbstractController(cc) {
 
   val healthyMessage : String = " is healthy"
 

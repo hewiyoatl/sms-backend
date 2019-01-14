@@ -1,16 +1,16 @@
 package helpers
 
-import play.api.Play
+import play.api.{Configuration}
 
 case class Auth0Config(secret: String, clientId: String, callbackURL: String, domain: String)
 
 object Auth0Config {
-  def get() = {
+  def get(config: Configuration) = {
     Auth0Config(
-      Play.current.configuration.getString("auth0.clientSecret").get,
-      Play.current.configuration.getString("auth0.clientId").get,
-      Play.current.configuration.getString("auth0.callbackURL").get,
-      Play.current.configuration.getString("auth0.domain").get
+      config.get[String]("auth0.clientSecret"),
+      config.get[String]("auth0.clientId"),
+      config.get[String]("auth0.callbackURL"),
+      config.get[String]("auth0.domain")
     )
   }
 }

@@ -1,19 +1,25 @@
 package controllers
 
 import helpers.Auth0Config
-import play.api.Play
-import play.api.Play.current
-import play.api.cache.Cache
+import javax.inject.Inject
+import play.api.Configuration
+import play.api.cache.SyncCacheApi
 import play.api.http.{HeaderNames, MimeTypes}
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.libs.json.{JsValue, Json}
-import play.api.libs.ws.WS
-import play.api.mvc.{Action, Controller}
+import play.api.libs.ws.WSClient
+import play.api.mvc._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class Callback extends Controller {
+
+class Callback @Inject()(cc: ControllerComponents)
+                        (implicit context: ExecutionContext,
+                         config: Configuration,
+                         metrics: MetricsFacade,
+                         wsClient: WSClient,
+                         env: play.api.Environment,
+                         cache: SyncCacheApi) extends AbstractController(cc) {
 
   def callback(codeOpt: Option[String] = None) = Action.async {
     (for {
@@ -21,7 +27,7 @@ class Callback extends Controller {
     } yield {
         getToken(code).flatMap { case (idToken, accessToken) =>
           getUser(accessToken).map { user =>
-            Cache.set(idToken + "profile", user)
+            cache.set(idToken + "profile", user)
             Redirect(routes.User.index())
               .withSession(
                 "idToken" -> idToken,
@@ -36,14 +42,15 @@ class Callback extends Controller {
   }
 
   def getToken(code: String): Future[(String, String)] = {
-    val config = Auth0Config.get()
-    val tokenResponse = WS.url(String.format("https://%s/oauth/token", config.domain))(Play.current).
-      withHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON).
-      post(
+    val authConfig = Auth0Config.get(config)
+    val tokenResponse =
+      wsClient.url(String.format("https://%s/oauth/token", authConfig.domain))
+        .addHttpHeaders(HeaderNames.ACCEPT -> MimeTypes.JSON)
+        .post(
         Json.obj(
-          "client_id" -> config.clientId,
-          "client_secret" -> config.secret,
-          "redirect_uri" -> config.callbackURL,
+          "client_id" -> authConfig.clientId,
+          "client_secret" -> authConfig.secret,
+          "redirect_uri" -> authConfig.callbackURL,
           "code" -> code,
           "grant_type" -> "authorization_code"
         )
@@ -61,9 +68,9 @@ class Callback extends Controller {
   }
 
   def getUser(accessToken: String): Future[JsValue] = {
-    val config = Auth0Config.get()
-    val userResponse = WS.url(String.format("https://%s/userinfo", config.domain))(Play.current)
-      .withQueryString("access_token" -> accessToken)
+    val authConfig = Auth0Config.get(config)
+    val userResponse = wsClient.url(String.format("https://%s/userinfo", authConfig.domain))
+      .addQueryStringParameters("access_token" -> accessToken)
       .get()
 
     userResponse.flatMap(response => Future.successful(response.json))
