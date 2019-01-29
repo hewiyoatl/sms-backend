@@ -1,11 +1,11 @@
 package model
 
-import play.api.Play
+import com.google.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.db.slick.DatabaseConfigProvider
-import slick.driver.JdbcProfile
-import slick.driver.MySQLDriver.api._
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import slick.driver.PostgresDriver.api._
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -37,7 +37,7 @@ object UserForm {
   )
 }
 
-class UserTableDef(tag: Tag) extends Table[User](tag, "client") {
+class UserTableDef(tag: Tag) extends Table[User](tag, Some("no_waiting"), "client") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -55,14 +55,12 @@ class UserTableDef(tag: Tag) extends Table[User](tag, "client") {
     (id, firstName, lastName, mobile, email, deleted) <>(User.tupled, User.unapply)
 }
 
-object Users {
-
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
+class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   val users = TableQuery[UserTableDef]
 
   def add(user: User): Future[Option[UserOutbound]] = {
-    dbConfig.db.run((for {
+    db.run((for {
       newId <- (users returning users.map(_.id)) += user
       a <- users.filter(u => u.id === newId && u.deleted === false).map(
         u => (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(
@@ -75,11 +73,11 @@ object Users {
   }
 
   def delete(id: Long): Future[Int] = {
-    dbConfig.db.run(users.filter(_.id === id).map(u => u.deleted).update(true))
+    db.run(users.filter(_.id === id).map(u => u.deleted).update(true))
   }
 
   def listAll: Future[Seq[UserOutbound]] = {
-    dbConfig.db.run(users.filter(_.deleted === false).map(u =>
+    db.run(users.filter(_.deleted === false).map(u =>
       (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(
         _.seq.map {
           case (id, firstName, lastName, mobile, email) =>
@@ -90,7 +88,7 @@ object Users {
   }
 
   def retrieveUser(id: Long): Future[Option[UserOutbound]] = {
-    dbConfig.db.run(users.filter(u => u.id === id && u.deleted === false).map(
+    db.run(users.filter(u => u.id === id && u.deleted === false).map(
       u => (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(
         _.headOption.map {
           case (id, firstName, lastName, mobile, email) =>
@@ -101,7 +99,7 @@ object Users {
 
   def patchUser(user: User): Future[Option[UserOutbound]] = {
 
-    dbConfig.db.run((for {
+    db.run((for {
       _ <- users.filter(u =>
         u.mobile === user.mobile && u.deleted === false).map(u =>
         (u.firstName, u.lastName, u.email)).update(

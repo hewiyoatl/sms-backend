@@ -1,9 +1,9 @@
-CREATE TABLE hewiyoat_no_waiting.restaurant (
+CREATE TABLE no_waiting.restaurant (
   id   SERIAL PRIMARY KEY,
   name VARCHAR(100)
 );
 
-CREATE TABLE hewiyoat_no_waiting.sucursal (
+CREATE TABLE no_waiting.sucursal (
   id                SERIAL PRIMARY KEY,
   address_1         VARCHAR(500),
   address_2         VARCHAR(500),
@@ -12,26 +12,26 @@ CREATE TABLE hewiyoat_no_waiting.sucursal (
   city              VARCHAR(100),
   country           VARCHAR(10),
   phone_number      VARCHAR(20),
-  restaurant_id     BIGINT UNSIGNED NOT NULL,
-  latitude          FLOAT           NOT NULL,
-  longitud          FLOAT           NOT NULL,
+  restaurant_id     BIGINT NOT NULL,
+  latitude          FLOAT  NOT NULL,
+  longitud          FLOAT  NOT NULL,
   created_timestamp TIMESTAMP,
   deleted           BOOLEAN DEFAULT FALSE,
-  FOREIGN KEY (restaurant_id) REFERENCES hewiyoat_no_waiting.restaurant (id)
+  FOREIGN KEY (restaurant_id) REFERENCES no_waiting.restaurant (id)
 );
 
-CREATE TABLE hewiyoat_no_waiting.service_time (
+CREATE TABLE no_waiting.service_time (
   id          SERIAL PRIMARY KEY,
-  sucursal_id BIGINT UNSIGNED,
+  sucursal_id BIGINT,
   day         INT,
   start_time  TIMESTAMP,
   end_time    TIMESTAMP,
-  FOREIGN KEY (sucursal_id) REFERENCES hewiyoat_no_waiting.sucursal (id)
+  FOREIGN KEY (sucursal_id) REFERENCES no_waiting.sucursal (id)
 );
 
-CREATE TABLE hewiyoat_no_waiting.rest_user (
+CREATE TABLE no_waiting.rest_user (
   id                SERIAL PRIMARY KEY,
-  sucursal_id       BIGINT UNSIGNED,
+  sucursal_id       BIGINT,
   first_name        VARCHAR(100),
   last_name         VARCHAR(100),
   phone_number      VARCHAR(20),
@@ -39,10 +39,10 @@ CREATE TABLE hewiyoat_no_waiting.rest_user (
   password          VARCHAR(64),
   created_timestamp TIMESTAMP,
   deleted           BOOLEAN DEFAULT FALSE,
-  FOREIGN KEY (sucursal_id) REFERENCES hewiyoat_no_waiting.sucursal (id)
+  FOREIGN KEY (sucursal_id) REFERENCES no_waiting.sucursal (id)
 );
 
-CREATE TABLE hewiyoat_no_waiting.client (
+CREATE TABLE no_waiting.client (
   id                SERIAL PRIMARY KEY,
   phone_number      VARCHAR(20) UNIQUE,
   first_name        VARCHAR(100),
@@ -54,24 +54,24 @@ CREATE TABLE hewiyoat_no_waiting.client (
   deleted           BOOLEAN DEFAULT FALSE NOT NULL
 );
 
-CREATE TABLE hewiyoat_no_waiting.reservation (
+CREATE TABLE no_waiting.reservation (
   id                SERIAL PRIMARY KEY,
-  user_id           BIGINT UNSIGNED,
-  user_type         BIGINT UNSIGNED,
-  sucursal_id       BIGINT UNSIGNED,
+  user_id           BIGINT,
+  user_type         BIGINT,
+  sucursal_id       BIGINT,
   status            INT,
   created_timestamp TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES hewiyoat_no_waiting.client (id),
-  FOREIGN KEY (sucursal_id) REFERENCES hewiyoat_no_waiting.sucursal (id)
+  FOREIGN KEY (user_id) REFERENCES no_waiting.client (id),
+  FOREIGN KEY (sucursal_id) REFERENCES no_waiting.sucursal (id)
 );
 
-CREATE TABLE hewiyoat_no_waiting.reservation_event (
+CREATE TABLE no_waiting.reservation_event (
   id                SERIAL PRIMARY KEY,
-  user_id           BIGINT UNSIGNED,
-  user_type         BIGINT UNSIGNED,
-  reservation_id    BIGINT UNSIGNED,
+  user_id           BIGINT,
+  user_type         BIGINT,
+  reservation_id    BIGINT,
   status            INT,
   created_timestamp TIMESTAMP,
-  FOREIGN KEY (reservation_id) REFERENCES hewiyoat_no_waiting.reservation (id)
+  FOREIGN KEY (reservation_id) REFERENCES no_waiting.reservation (id)
 );
 

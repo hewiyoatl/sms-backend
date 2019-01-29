@@ -1,15 +1,12 @@
 package models
 
-import java.sql.Date
-
+import com.google.inject.Inject
 import org.joda.time.DateTime
-import play.api.Play
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.db.slick.DatabaseConfigProvider
-import slick.driver.JdbcProfile
-import slick.driver.MySQLDriver.api._
-
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import slick.driver.PostgresDriver.api._
+import slick.jdbc.JdbcProfile
 import utilities.DateTimeMapper._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -99,14 +96,12 @@ class RestaurantTableDef(tag: Tag) extends Table[Restaurant](tag, "sucursal") {
     deleted) <>(Restaurant.tupled, Restaurant.unapply)
 }
 
-object Restaurants {
-
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
+class Restaurants @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   val restaurants = TableQuery[RestaurantTableDef]
 
   def add(restaurant: Restaurant): Future[Option[RestaurantOutbound]] = {
-    dbConfig.db.run((for {
+    db.run((for {
       newId <- (restaurants returning restaurants.map(_.id)) += restaurant
       a <- restaurants.filter(r => r.id === newId && r.deleted === false).map(
         r => (r.id,
@@ -150,11 +145,11 @@ object Restaurants {
   }
 
   def delete(id: Long): Future[Int] = {
-    dbConfig.db.run(restaurants.filter(_.id === id).map(u => u.deleted).update(true))
+    db.run(restaurants.filter(_.id === id).map(u => u.deleted).update(true))
   }
 
   def listAll: Future[Seq[RestaurantOutbound]] = {
-    dbConfig.db.run(restaurants.filter(_.deleted === false).map(r =>
+    db.run(restaurants.filter(_.deleted === false).map(r =>
       (
         r.id,
         r.address1,
@@ -198,7 +193,7 @@ object Restaurants {
   }
 
   def retrieveRestaurant(id: Long): Future[Option[RestaurantOutbound]] = {
-    dbConfig.db.run(restaurants.filter(u => u.id === id && u.deleted === false).map(
+    db.run(restaurants.filter(u => u.id === id && u.deleted === false).map(
       r => (
         r.id,
         r.address1,
@@ -242,7 +237,7 @@ object Restaurants {
 
   def patchRestaurant(restaurant: Restaurant): Future[Option[RestaurantOutbound]] = {
 
-    dbConfig.db.run((for {
+    db.run((for {
       _ <- restaurants.filter(r =>
         r.id === restaurant.id && r.deleted === false).map(r =>
         (

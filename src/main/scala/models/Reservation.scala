@@ -1,14 +1,14 @@
 package models
 
+import com.google.inject.Inject
 import org.joda.time.DateTime
-import play.api.Play
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.db.slick.DatabaseConfigProvider
-import slick.driver.JdbcProfile
-import slick.driver.MySQLDriver.api._
-import utilities.MaybeFilter
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import slick.driver.PostgresDriver.api._
+import slick.jdbc.JdbcProfile
 import utilities.DateTimeMapper._
+import utilities.MaybeFilter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,7 +41,7 @@ object ReservationForm {
   )
 }
 
-class ReservationTableDef(tag: Tag) extends Table[Reservation](tag, "reservation") {
+class ReservationTableDef(tag: Tag) extends Table[Reservation](tag, Some("no_waiting"), "reservation") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -59,14 +59,12 @@ class ReservationTableDef(tag: Tag) extends Table[Reservation](tag, "reservation
     (id, userId, userType, locationId, status, createdTimestamp) <>(Reservation.tupled, Reservation.unapply)
 }
 
-object Reservations {
-
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
+class Reservations @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   val reservations = TableQuery[ReservationTableDef]
 
   def add(reservation: Reservation): Future[Option[ReservationOutbound]] = {
-    dbConfig.db.run((for {
+    db.run((for {
       newId <- (reservations returning reservations.map(_.id)) += reservation
       a <- reservations.filter(reservation => reservation.id === newId).map(
         reservation => (
@@ -100,13 +98,13 @@ object Reservations {
 
   def delete(id: Long): Future[Int] = {
     // TODO: WE NEED TO SET THE STATUS CODES. HERE 2 MEANS CANCCELLED
-    dbConfig.db.run(reservations.filter(_.id === id).map(u => u.status).update(Some(2)))
+    db.run(reservations.filter(_.id === id).map(u => u.status).update(Some(2)))
   }
 
   def listAll(location: Option[Long]): Future[Seq[ReservationOutbound]] = {
 
     // TODO: WE NEED TO SET THE STATUS CODES. HERE 2 MEANS THAT IT IS CANCELLED.
-    dbConfig.db.run(
+    db.run(
       MaybeFilter(reservations)
         .filter(location)(v => d => d.locationId === v)
         .filter(Some(2))(v => d => d.status =!= v).query.map(reservation =>
@@ -128,7 +126,7 @@ object Reservations {
   def retrieveReservation(id: Long): Future[Option[ReservationOutbound]] = {
 
     // TODO: WE NEED TO SET STATUS CODES
-    dbConfig.db.run(reservations.filter(reservation => reservation.id === id && reservation.status =!= Option(2)).map(
+    db.run(reservations.filter(reservation => reservation.id === id && reservation.status =!= Option(2)).map(
       reservation => (
         reservation.id,
         reservation.userId,
@@ -146,7 +144,7 @@ object Reservations {
 
   def patchReservation(reservation: Reservation): Future[Option[ReservationOutbound]] = {
 
-    dbConfig.db.run((for {
+    db.run((for {
       _ <- reservations.filter(r =>
         r.id === reservation.id && r.status =!= Option(2)).map(r =>
         (r.status)).update(

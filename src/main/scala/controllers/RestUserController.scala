@@ -1,19 +1,18 @@
 package controllers
 
-import formatter._
 import javax.inject.Inject
-import models.RestUser
+
+import formatter._
+import models.{RestUser, RestUsers}
 import play.api.db.Database
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class RestUserController @Inject()(cc: ControllerComponents)
+class RestUserController @Inject()(cc: ControllerComponents, restUsers: RestUsers)
                                   (implicit context: ExecutionContext,
-                                   database: Database,
-                                   metrics: MetricsFacade) extends AbstractController(cc) {
+                                   database: Database) extends AbstractController(cc) {
 
   implicit val RestUserReader = RestUserFormatter.RestUserReader
 
@@ -22,7 +21,7 @@ class RestUserController @Inject()(cc: ControllerComponents)
   implicit val errorWriter = ErrorFormatter.errorWriter
 
   def listRestUsers = Action.async { implicit request =>
-    RestUserFacade.listAllRestUsers map { restUsers =>
+    restUsers.listAll map { restUsers =>
 
       Ok(Json.toJson(restUsers))
     }
@@ -51,7 +50,7 @@ class RestUserController @Inject()(cc: ControllerComponents)
             userInboud.password,
             false)
 
-          RestUserFacade.addRestUser(newRestUser) map { restUser =>
+          restUsers.add(newRestUser) map { restUser =>
 
             Created(Json.toJson(restUser))
           }
@@ -64,12 +63,12 @@ class RestUserController @Inject()(cc: ControllerComponents)
   }
 
   def deleteRestUser(id: Long) = Action.async { implicit request =>
-    RestUserFacade.deleteRestUser(id)
+    restUsers.delete(id)
     Future(NoContent)
   }
 
   def retrieveRestUser(id: Long) = Action.async { implicit request =>
-    RestUserFacade.retrieveRestUser(id) map { restUser =>
+    restUsers.retrieveRestUser(id) map { restUser =>
 
       Ok(Json.toJson(restUser))
     }
@@ -97,7 +96,7 @@ class RestUserController @Inject()(cc: ControllerComponents)
             restUserInboud.password,
             false)
 
-          RestUserFacade.patchRestUser(patchRestUser) map { restUser =>
+          restUsers.patchRestUser(patchRestUser) map { restUser =>
 
             Ok(Json.toJson(restUser))
           }

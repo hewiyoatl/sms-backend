@@ -108,23 +108,23 @@ def getConfig: com.typesafe.config.Config = {
 // liquibaseChangelog := file("./liquidbase/scripts/changesets/changelog.xml")
 
 
-flywayUrl := getConfig.getString("db.default.url")
-
-flywaySchemas := Seq("doc_answer")
-
-flywayUser := getConfig.getString("db.default.user")
-
-flywayPassword := getConfig.getString("db.default.password")
-
-flywaySqlMigrationPrefix := ""
-
-flywayRepeatableSqlMigrationPrefix := ""
-
-flywayLocations := Seq("filesystem:./data/sql")
-
-flywaySqlMigrationSeparator := "_"
-
-flywayTable := "flyway_schema_version"
+//flywayUrl := getConfig.getString("db.default.url")
+//
+//flywaySchemas := Seq("doc_answer")
+//
+//flywayUser := getConfig.getString("db.default.user")
+//
+//flywayPassword := getConfig.getString("db.default.password")
+//
+//flywaySqlMigrationPrefix := ""
+//
+//flywayRepeatableSqlMigrationPrefix := ""
+//
+//flywayLocations := Seq("filesystem:./data/sql")
+//
+//flywaySqlMigrationSeparator := "_"
+//
+//flywayTable := "flyway_schema_version"
 
 
 // to generate the docker images

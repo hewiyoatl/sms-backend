@@ -2,7 +2,7 @@ package controllers
 
 import formatter._
 import javax.inject.Inject
-import models.Restaurant
+import models.{Restaurant, Restaurants}
 import play.api.db.Database
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class RestaurantController @Inject()(cc: ControllerComponents)
+class RestaurantController @Inject()(cc: ControllerComponents, restaurants: Restaurants)
                                     (implicit context: ExecutionContext,
                                      database: Database,
                                      metrics: MetricsFacade) extends AbstractController(cc) {
@@ -23,7 +23,7 @@ class RestaurantController @Inject()(cc: ControllerComponents)
   implicit val errorWriter = ErrorFormatter.errorWriter
 
   def listRestaurants = Action.async { implicit request =>
-    RestaurantFacade.listAllRestaurants map { restaurants =>
+    restaurants.listAll map { restaurants =>
 
       Ok(Json.toJson(restaurants))
     }
@@ -57,7 +57,7 @@ class RestaurantController @Inject()(cc: ControllerComponents)
             None,
             false)
 
-          RestaurantFacade.addRestaurant(newRestaurant) map { user =>
+          restaurants.add(newRestaurant) map { user =>
 
             Created(Json.toJson(user))
           }
@@ -70,12 +70,12 @@ class RestaurantController @Inject()(cc: ControllerComponents)
   }
 
   def deleteRestaurant(id: Long) = Action.async { implicit request =>
-    RestaurantFacade.deleteRestaurant(id)
+    restaurants.delete(id)
     Future(NoContent)
   }
 
   def retrieveRestaurant(id: Long) = Action.async { implicit request =>
-    RestaurantFacade.retrieveRetaurant(id) map { restaurant =>
+    restaurants.retrieveRestaurant(id) map { restaurant =>
 
       Ok(Json.toJson(restaurant))
     }
@@ -108,7 +108,7 @@ class RestaurantController @Inject()(cc: ControllerComponents)
             None,
             false)
 
-          RestaurantFacade.patchRestaurant(patchRestaurant) map { restaurant =>
+          restaurants.patchRestaurant(patchRestaurant) map { restaurant =>
 
             Ok(Json.toJson(restaurant))
           }

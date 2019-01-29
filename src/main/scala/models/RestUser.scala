@@ -1,12 +1,11 @@
 package models
 
-import model.UserOutbound
-import play.api.Play
+import com.google.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms._
-import play.api.db.slick.DatabaseConfigProvider
-import slick.driver.JdbcProfile
-import slick.driver.MySQLDriver.api._
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import slick.driver.PostgresDriver.api._
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -70,14 +69,12 @@ class RestUserTableDef(tag: Tag) extends Table[RestUser](tag, "rest_user") {
       deleted) <>(RestUser.tupled, RestUser.unapply)
 }
 
-object RestUsers {
-
-  val dbConfig = DatabaseConfigProvider.get[JdbcProfile](Play.current)
+class RestUsers @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   val restUsers = TableQuery[RestUserTableDef]
 
   def add(restUser: RestUser): Future[Option[RestUserOutbound]] = {
-    dbConfig.db.run((for {
+    db.run((for {
       newId <- (restUsers returning restUsers.map(_.id)) += restUser
       a <- restUsers.filter(u => u.id === newId && u.deleted === false).map(
         u => (u.id, u.firstName, u.lastName, u.mobile, u.userName)).result.map(
@@ -90,11 +87,11 @@ object RestUsers {
   }
 
   def delete(id: Long): Future[Int] = {
-    dbConfig.db.run(restUsers.filter(_.id === id).map(u => u.deleted).update(true))
+    db.run(restUsers.filter(_.id === id).map(u => u.deleted).update(true))
   }
 
   def listAll: Future[Seq[RestUserOutbound]] = {
-    dbConfig.db.run(restUsers.filter(_.deleted === false).map(u =>
+    db.run(restUsers.filter(_.deleted === false).map(u =>
       (u.id, u.firstName, u.lastName, u.mobile, u.userName)).result.map(
         _.seq.map {
           case (id, firstName, lastName, mobile, userName) =>
@@ -105,7 +102,7 @@ object RestUsers {
   }
 
   def retrieveRestUser(id: Long): Future[Option[RestUserOutbound]] = {
-    dbConfig.db.run(restUsers.filter(u => u.id === id && u.deleted === false).map(
+    db.run(restUsers.filter(u => u.id === id && u.deleted === false).map(
       u => (u.id, u.firstName, u.lastName, u.mobile, u.userName)).result.map(
         _.headOption.map {
           case (id, firstName, lastName, mobile, userName) =>
@@ -116,7 +113,7 @@ object RestUsers {
 
   def patchRestUser(restUser: RestUser): Future[Option[RestUserOutbound]] = {
 
-    dbConfig.db.run((for {
+    db.run((for {
       _ <- restUsers.filter(u =>
         u.id === restUser.id && u.deleted === false).map(u =>
         (u.firstName, u.lastName, u.mobile, u.password)).update(

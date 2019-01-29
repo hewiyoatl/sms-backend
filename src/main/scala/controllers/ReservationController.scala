@@ -2,7 +2,7 @@ package controllers
 
 import formatter._
 import javax.inject.Inject
-import models.Reservation
+import models.{Reservations, Reservation}
 import play.api.db.Database
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class ReservationController @Inject()(cc: ControllerComponents)
+class ReservationController @Inject()(cc: ControllerComponents, reservations: Reservations)
                                      (implicit context: ExecutionContext,
                                       database: Database,
                                       metrics: MetricsFacade) extends AbstractController(cc) {
@@ -23,7 +23,7 @@ class ReservationController @Inject()(cc: ControllerComponents)
   implicit val errorWriter = ErrorFormatter.errorWriter
 
   def listReservations(location: Option[Long]) = Action.async { implicit request =>
-    ReservationFacade.listAllReservations(location) map { reservations =>
+    reservations.listAll(location) map { reservations =>
 
       Ok(Json.toJson(reservations))
     }
@@ -50,7 +50,7 @@ class ReservationController @Inject()(cc: ControllerComponents)
             Some(1),
             None)
 
-          ReservationFacade.addReservation(reservationUser) map { reservation =>
+          reservations.add(reservationUser) map { reservation =>
 
             Created(Json.toJson(reservation))
           }
@@ -63,12 +63,12 @@ class ReservationController @Inject()(cc: ControllerComponents)
   }
 
   def deleteReservation(id: Long) = Action.async { implicit request =>
-    ReservationFacade.deleteReservation(id)
+    reservations.delete(id)
     Future(NoContent)
   }
 
   def retrieveReservation(id: Long) = Action.async { implicit request =>
-    ReservationFacade.retrieveReservation(id) map { reservation =>
+    reservations.retrieveReservation(id) map { reservation =>
 
       Ok(Json.toJson(reservation))
     }
@@ -94,7 +94,7 @@ class ReservationController @Inject()(cc: ControllerComponents)
             reservationInboud.status,
             None)
 
-          ReservationFacade.patchReservation(reservationReservation) map { reservation =>
+          reservations.patchReservation(reservationReservation) map { reservation =>
 
             Ok(Json.toJson(reservation))
           }

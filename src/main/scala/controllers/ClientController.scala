@@ -1,19 +1,18 @@
 package controllers
 
-import formatter.{Error, ErrorFormatter, UserFormatter, UserInbound}
 import javax.inject.Inject
+
+import formatter.{Error, ErrorFormatter, UserFormatter, UserInbound}
+import model.Users
 import play.api.Configuration
 import play.api.cache.SyncCacheApi
-import play.api.libs.ws.WSClient
-
-import scala.concurrent.ExecutionContext
 import play.api.libs.json.{JsResult, JsValue, Json}
+import play.api.libs.ws.WSClient
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class ClientController @Inject()(cc: ControllerComponents)
+class ClientController @Inject()(cc: ControllerComponents, users: Users)
                                 (implicit context: ExecutionContext,
                                  config: Configuration,
                                  metrics: MetricsFacade,
@@ -28,7 +27,7 @@ class ClientController @Inject()(cc: ControllerComponents)
   implicit val errorWriter = ErrorFormatter.errorWriter
 
   def listUsers = Action.async { implicit request =>
-    ClientFacade.listAllUsers map { users =>
+    users.listAll map { users =>
 
       Ok(Json.toJson(users))
     }
@@ -55,7 +54,7 @@ class ClientController @Inject()(cc: ControllerComponents)
             userInboud.email,
             false)
 
-          ClientFacade.addUser(newUser) map { user =>
+          users.add(newUser) map { user =>
 
             Created(Json.toJson(user))
           }
@@ -68,12 +67,12 @@ class ClientController @Inject()(cc: ControllerComponents)
   }
 
   def deleteUser(id: Long) = Action.async { implicit request =>
-    ClientFacade.deleteUser(id)
+    users.delete(id)
     Future(NoContent)
   }
 
   def retrieveUser(id: Long) = Action.async { implicit request =>
-    ClientFacade.retrieveUser(id) map { user =>
+    users.retrieveUser(id) map { user =>
 
       Ok(Json.toJson(user))
     }
@@ -99,7 +98,7 @@ class ClientController @Inject()(cc: ControllerComponents)
             userInboud.email,
             false)
 
-          ClientFacade.patchUser(patchUser) map { user =>
+          users.patchUser(patchUser) map { user =>
 
             Ok(Json.toJson(user))
           }
