@@ -64,36 +64,38 @@ class Reservations @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
   val reservations = TableQuery[ReservationTableDef]
 
   def add(reservation: Reservation): Future[Option[ReservationOutbound]] = {
-    db.run((for {
-      newId <- (reservations returning reservations.map(_.id)) += reservation
-      a <- reservations.filter(reservation => reservation.id === newId).map(
-        reservation => (
-          reservation.id,
-          reservation.userId,
-          reservation.userType,
-          reservation.locationId,
-          reservation.status,
-          reservation.createdTimestamp)).result.map(
-          _.headOption.map {
-            case (
-              id,
-              userId,
-              userType,
-              locationId,
-              status,
-              createdTimestamp
-              ) =>
-              ReservationOutbound(
+    db.run(
+      ((reservations returning reservations.map(_.id)) += reservation).flatMap(newId => {
+
+        reservations.filter(reservation => reservation.id === newId).map(
+          reservation => (
+            reservation.id,
+            reservation.userId,
+            reservation.userType,
+            reservation.locationId,
+            reservation.status,
+            reservation.createdTimestamp)).result.map(
+            _.headOption.map {
+              case (
                 id,
                 userId,
                 userType,
                 locationId,
                 status,
                 createdTimestamp
-              )
-          }
-        )
-    } yield a).transactionally)
+                ) =>
+                ReservationOutbound(
+                  id,
+                  userId,
+                  userType,
+                  locationId,
+                  status,
+                  createdTimestamp
+                )
+            }
+          )
+
+      }).transactionally)
   }
 
   def delete(id: Long): Future[Int] = {
@@ -144,23 +146,23 @@ class Reservations @Inject()(val dbConfigProvider: DatabaseConfigProvider) exten
 
   def patchReservation(reservation: Reservation): Future[Option[ReservationOutbound]] = {
 
-    db.run((for {
-      _ <- reservations.filter(r =>
+    db.run(
+      reservations.filter(r =>
         r.id === reservation.id && r.status =!= Option(2)).map(r =>
         (r.status)).update(
           reservation.status
-        )
+        ).flatMap(x => {
 
-      // TODO: SET THE CODE
-      a <- reservations.filter(u => u.id === reservation.id && u.status =!= Option(2)).map(
-        u => (u.id, u.userId, u.userType, u.locationId, u.status, u.createdTimestamp)).result.map(
-          _.headOption.map {
-            case (id, userId, userType, locationId, status, createdTimestamp) =>
-              ReservationOutbound(id, userId, userType, locationId, status, createdTimestamp)
-          }
-        )
+        // TODO: SET THE CODE
+        reservations.filter(u => u.id === reservation.id && u.status =!= Option(2)).map(
+          u => (u.id, u.userId, u.userType, u.locationId, u.status, u.createdTimestamp)).result.map(
+            _.headOption.map {
+              case (id, userId, userType, locationId, status, createdTimestamp) =>
+                ReservationOutbound(id, userId, userType, locationId, status, createdTimestamp)
+            }
+          )
 
-    } yield a).transactionally)
+      }).transactionally)
   }
 
 }

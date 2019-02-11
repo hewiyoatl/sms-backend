@@ -60,16 +60,20 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
   val users = TableQuery[UserTableDef]
 
   def add(user: User): Future[Option[UserOutbound]] = {
-    db.run((for {
-      newId <- (users returning users.map(_.id)) += user
-      a <- users.filter(u => u.id === newId && u.deleted === false).map(
-        u => (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(
-          _.headOption.map {
-            case (id, firstName, lastName, mobile, email) =>
-              UserOutbound(id, firstName, lastName, mobile, email)
-          }
-        )
-    } yield a).transactionally)
+
+    db.run(
+
+      ((users returning users.map(_.id)) += user).flatMap(newId =>
+
+        users.filter(u => u.id === newId && u.deleted === false).map(u =>
+
+          (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(_.headOption.map {
+
+          case (id, firstName, lastName, mobile, email) =>
+            UserOutbound(id, firstName, lastName, mobile, email)
+        })
+
+      ).transactionally)
   }
 
   def delete(id: Long): Future[Int] = {
@@ -99,22 +103,18 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
 
   def patchUser(user: User): Future[Option[UserOutbound]] = {
 
-    db.run((for {
-      _ <- users.filter(u =>
-        u.mobile === user.mobile && u.deleted === false).map(u =>
-        (u.firstName, u.lastName, u.email)).update(
-          user.firstName, user.lastName, user.email
-        )
+    db.run(
 
-      a <- users.filter(u => u.mobile === user.mobile && u.deleted === false).map(
-        u => (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(
-          _.headOption.map {
-            case (id, firstName, lastName, mobile, email) =>
-              UserOutbound(id, firstName, lastName, mobile, email)
-          }
-        )
+      users.filter(u => u.mobile === user.mobile && u.deleted === false).map(u => (u.firstName, u.lastName, u.email))
+        .update(user.firstName, user.lastName, user.email)
+        .flatMap(x =>
 
-    } yield a).transactionally)
+        users.filter(u => u.mobile === user.mobile && u.deleted === false).map(u =>
+          (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(_.headOption.map {
+          case (id, firstName, lastName, mobile, email) => UserOutbound(id, firstName, lastName, mobile, email)
+
+        })).transactionally)
+
   }
 
 }

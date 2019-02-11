@@ -101,47 +101,49 @@ class Restaurants @Inject()(val dbConfigProvider: DatabaseConfigProvider) extend
   val restaurants = TableQuery[RestaurantTableDef]
 
   def add(restaurant: Restaurant): Future[Option[RestaurantOutbound]] = {
-    db.run((for {
-      newId <- (restaurants returning restaurants.map(_.id)) += restaurant
-      a <- restaurants.filter(r => r.id === newId && r.deleted === false).map(
-        r => (r.id,
-          r.address1,
-          r.address2,
-          r.zipCode,
-          r.state,
-          r.city,
-          r.country,
-          r.phoneNumber,
-          r.latitude,
-          r.longitude,
-          r.createdTimestamp)).result.map(
-          _.headOption.map {
-            case (id,
-            address1,
-            address2,
-            zipCode,
-            state,
-            city,
-            country,
-            phoneNumber,
-            latitude,
-            longitude,
-            createdTimestamp) =>
-              RestaurantOutbound(
-                id,
-                address1,
-                address2,
-                zipCode,
-                state,
-                city,
-                country,
-                phoneNumber,
-                latitude,
-                longitude,
-                createdTimestamp)
-          }
-        )
-    } yield a).transactionally)
+
+    db.run(
+      ((restaurants returning restaurants.map(_.id)) += restaurant).flatMap(newId => {
+
+        restaurants.filter(r => r.id === newId && r.deleted === false).map(
+          r => (r.id,
+            r.address1,
+            r.address2,
+            r.zipCode,
+            r.state,
+            r.city,
+            r.country,
+            r.phoneNumber,
+            r.latitude,
+            r.longitude,
+            r.createdTimestamp)).result.map(
+            _.headOption.map {
+              case (id,
+              address1,
+              address2,
+              zipCode,
+              state,
+              city,
+              country,
+              phoneNumber,
+              latitude,
+              longitude,
+              createdTimestamp) =>
+                RestaurantOutbound(
+                  id,
+                  address1,
+                  address2,
+                  zipCode,
+                  state,
+                  city,
+                  country,
+                  phoneNumber,
+                  latitude,
+                  longitude,
+                  createdTimestamp)
+            }
+          )
+      }).transactionally)
   }
 
   def delete(id: Long): Future[Int] = {
@@ -237,8 +239,8 @@ class Restaurants @Inject()(val dbConfigProvider: DatabaseConfigProvider) extend
 
   def patchRestaurant(restaurant: Restaurant): Future[Option[RestaurantOutbound]] = {
 
-    db.run((for {
-      _ <- restaurants.filter(r =>
+    db.run(
+      restaurants.filter(r =>
         r.id === restaurant.id && r.deleted === false).map(r =>
         (
           r.address1,
@@ -259,35 +261,23 @@ class Restaurants @Inject()(val dbConfigProvider: DatabaseConfigProvider) extend
           restaurant.phoneNumber,
           restaurant.latitude,
           restaurant.longitude
-        )
+        ).flatMap(x => {
 
-      a <- restaurants.filter(u => u.id === restaurant.id && u.deleted === false).map(
-        r => (
-          r.id,
-          r.address1,
-          r.address2,
-          r.zipCode,
-          r.state,
-          r.city,
-          r.country,
-          r.phoneNumber,
-          r.latitude,
-          r.longitude,
-          r.createdTimestamp)).result.map(
-          _.headOption.map {
-            case (
-              id,
-              address1,
-              address2,
-              zipCode,
-              state,
-              city,
-              country,
-              phoneNumber,
-              latitude,
-              longitude,
-              createdTimestamp) =>
-              RestaurantOutbound(
+        restaurants.filter(u => u.id === restaurant.id && u.deleted === false).map(
+          r => (
+            r.id,
+            r.address1,
+            r.address2,
+            r.zipCode,
+            r.state,
+            r.city,
+            r.country,
+            r.phoneNumber,
+            r.latitude,
+            r.longitude,
+            r.createdTimestamp)).result.map(
+            _.headOption.map {
+              case (
                 id,
                 address1,
                 address2,
@@ -298,11 +288,24 @@ class Restaurants @Inject()(val dbConfigProvider: DatabaseConfigProvider) extend
                 phoneNumber,
                 latitude,
                 longitude,
-                createdTimestamp)
-          }
-        )
+                createdTimestamp) =>
+                RestaurantOutbound(
+                  id,
+                  address1,
+                  address2,
+                  zipCode,
+                  state,
+                  city,
+                  country,
+                  phoneNumber,
+                  latitude,
+                  longitude,
+                  createdTimestamp)
+            }
+          )
 
-    } yield a).transactionally)
+      }).transactionally)
+
   }
 
 }

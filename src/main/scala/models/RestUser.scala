@@ -74,16 +74,17 @@ class RestUsers @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends 
   val restUsers = TableQuery[RestUserTableDef]
 
   def add(restUser: RestUser): Future[Option[RestUserOutbound]] = {
-    db.run((for {
-      newId <- (restUsers returning restUsers.map(_.id)) += restUser
-      a <- restUsers.filter(u => u.id === newId && u.deleted === false).map(
-        u => (u.id, u.firstName, u.lastName, u.mobile, u.userName)).result.map(
-          _.headOption.map {
-            case (id, firstName, lastName, mobile, userName) =>
-              RestUserOutbound(id, firstName, lastName, mobile, userName)
-          }
-        )
-    } yield a).transactionally)
+    db.run(
+      ((restUsers returning restUsers.map(_.id)) += restUser).flatMap(newId =>
+
+        restUsers.filter(u => u.id === newId && u.deleted === false).map(
+          u => (u.id, u.firstName, u.lastName, u.mobile, u.userName)).result.map(
+            _.headOption.map {
+              case (id, firstName, lastName, mobile, userName) =>
+                RestUserOutbound(id, firstName, lastName, mobile, userName)
+            }
+          )).transactionally)
+
   }
 
   def delete(id: Long): Future[Int] = {
@@ -113,22 +114,23 @@ class RestUsers @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends 
 
   def patchRestUser(restUser: RestUser): Future[Option[RestUserOutbound]] = {
 
-    db.run((for {
-      _ <- restUsers.filter(u =>
+    db.run(
+      restUsers.filter(u =>
         u.id === restUser.id && u.deleted === false).map(u =>
         (u.firstName, u.lastName, u.mobile, u.password)).update(
           restUser.firstName, restUser.lastName, restUser.mobile, restUser.password
-        )
+        ).flatMap(x => {
 
-      a <- restUsers.filter(u => u.id === restUser.id && u.deleted === false).map(
-        u => (u.id, u.firstName, u.lastName, u.mobile, u.password)).result.map(
-          _.headOption.map {
-            case (id, firstName, lastName, mobile, password) =>
-              RestUserOutbound(id, firstName, lastName, mobile, password)
-          }
-        )
+        restUsers.filter(u => u.id === restUser.id && u.deleted === false).map(
+          u => (u.id, u.firstName, u.lastName, u.mobile, u.password)).result.map(
+            _.headOption.map {
+              case (id, firstName, lastName, mobile, password) =>
+                RestUserOutbound(id, firstName, lastName, mobile, password)
+            }
+          )
 
-    } yield a).transactionally)
+      }).transactionally)
+
   }
 
 }
