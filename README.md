@@ -152,8 +152,7 @@ Then run the following commands:
 
 ```ln -s /opt/releases/current/services/answers-backend/answers-backend.jar .```
 
-```nohup java -jar -Dhttp.port=9000 -DDATABASE_URL_DB=jdbc:postgresql://10.1.100.95:5432/rldev1?currentSchema=doc_answer
--DUSER_DB=postgres -DUSER_PASSWORD=postgres answers-backend.jar &```
+```nohup java -jar -Dhttp.port=9000 -DDATABASE_URL_DB=jdbc:postgresql://10.1.100.95:5432/rldev1?currentSchema=doc_answer -DUSER_DB=postgres -DUSER_PASSWORD=postgres answers-backend.jar &```
 
 Also we want ran the process once the port.txt was deleted: 
 
