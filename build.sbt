@@ -49,15 +49,15 @@ libraryDependencies ++= Seq(
   //"org.apache.kafka" % "kafka_2.11" % "0.10.0.0",
   //"net.cakesolutions" %% "scala-kafka-client" % "0.10.0.0",
   //"net.cakesolutions" %% "scala-kafka-client-akka" % "0.10.0.0",
-//  "nl.grons" %% "metrics-scala" % "3.5.4_a2.3",
-//  "io.prometheus" % "simpleclient" % "0.0.16",
-//  "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
-//  "io.prometheus" % "simpleclient_servlet" % "0.0.16",
-//  "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
-//  "com.aspose" % "words" % "14.3.0",
+  "nl.grons" %% "metrics-scala" % "3.5.4_a2.3",
+  "io.prometheus" % "simpleclient" % "0.0.16",
+  "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
+  "io.prometheus" % "simpleclient_servlet" % "0.0.16",
+  "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
+  "com.aspose" % "words" % "14.3.0",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "3.0.0",
-//  "mysql" % "mysql-connector-java" % "5.1.34",
+  "mysql" % "mysql-connector-java" % "5.1.34",
   //"org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "de.leanovate.play-mockws" %% "play-mockws" % "2.6.2" % Test)
 
@@ -128,13 +128,18 @@ def getConfig: com.typesafe.config.Config = {
 
 
 // to generate the docker images
-//enablePlugins(JavaAppPackaging)
+enablePlugins(JavaAppPackaging)
 
 //microservice plugin for mini kubernetus
-//enablePlugins(DirectoryMicroservice)
+enablePlugins(DirectoryMicroservice)
 
 // for the standalone jar
 assemblyMergeStrategy in assembly := {
+  // Building fat jar without META-INF
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  // Take last config file
+  case PathList(ps @ _*) if ps.last endsWith ".conf" => MergeStrategy.last
+  case PathList("reference-overrides.conf") => MergeStrategy.concat
   case PathList("org", "slf4j", xs @ _*) => MergeStrategy.last
   case PathList("com", "zaxxer", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", "log4j", xs @ _*) => MergeStrategy.last
