@@ -5,6 +5,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.PostgresDriver.api._
+import slick.driver.HsqldbDriver
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,7 +38,7 @@ object UserForm {
   )
 }
 
-class UserTableDef(tag: Tag) extends Table[User](tag, Some("no_waiting"), "client") {
+class UserTableDef(tag: Tag) extends Table[User](tag, Some("nowaiting"), "client") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

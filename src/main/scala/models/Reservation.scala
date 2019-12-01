@@ -41,7 +41,7 @@ object ReservationForm {
   )
 }
 
-class ReservationTableDef(tag: Tag) extends Table[Reservation](tag, Some("no_waiting"), "reservation") {
+class ReservationTableDef(tag: Tag) extends Table[Reservation](tag, Some("nowaiting"), "reservation") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

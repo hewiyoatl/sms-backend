@@ -17,7 +17,7 @@ lazy val root = (project in file(".")).settings(
   bashScriptExtraDefines ++= Seq(
     "export LC_ALL=C.UTF-8",
     "export LANG=C.UTF-8"
-  )).enablePlugins(PlayScala).dependsOn(metricsPlay).dependsOn(swaggerPlay25)
+  )).enablePlugins(PlayScala, PlayNettyServer).disablePlugins(PlayAkkaHttpServer).dependsOn(metricsPlay).dependsOn(swaggerPlay25)
 
 disablePlugins(PlayLayoutPlugin)
 PlayKeys.playMonitoredFiles ++= (sourceDirectories in(Compile, TwirlKeys.compileTemplates)).value
@@ -31,6 +31,7 @@ resolvers += "sonatype-releases" at "https://oss.sonatype.org/content/repositori
 resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
 resolvers += "Rocketlawyer Snapshots" at "http://f1tst-linbld100/nexus/content/repositories/snapshots"
 resolvers += "Rocketlawyer Releases" at "http://f1tst-linbld100/nexus/content/repositories/releases"
+resolvers += "netty" at "https://mvnrepository.com/artifact/io.netty/netty-all"
 
 libraryDependencies ++= Seq(
   ws,
@@ -39,7 +40,7 @@ libraryDependencies ++= Seq(
   guice,
   ehcache,
   "org.playframework.anorm" %% "anorm" % "2.6.1",
-  "org.postgresql" % "postgresql" % "9.4.1209",
+//  "org.postgresql" % "postgresql" % "9.4.1209",
   //"io.swagger" %% "swagger-play2" % "1.6.0",
   //"com.typesafe.play" %% "anorm" % "2.5.0",
   //"org.scalaz" %% "scalaz-core" % "7.1.1",
@@ -57,8 +58,9 @@ libraryDependencies ++= Seq(
   "com.aspose" % "words" % "14.3.0",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "3.0.0",
-  "mysql" % "mysql-connector-java" % "5.1.34",
+//  "mysql" % "mysql-connector-java" % "5.1.34",
   //"org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
+  "org.hsqldb" % "hsqldb" % "2.4.0",
   "de.leanovate.play-mockws" %% "play-mockws" % "2.6.2" % Test)
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
