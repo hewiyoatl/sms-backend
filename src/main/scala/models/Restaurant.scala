@@ -52,7 +52,7 @@ object RestaurantForm {
   )
 }
 
-class RestaurantTableDef(tag: Tag) extends Table[Restaurant](tag, "sucursal") {
+class RestaurantTableDef(tag: Tag) extends Table[Restaurant](tag, Some("nowaiting"),"sucursal") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

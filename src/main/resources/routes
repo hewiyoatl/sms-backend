@@ -26,6 +26,10 @@ DELETE  /noqueue/v1/reservations/:id            controllers.ReservationControlle
 GET     /noqueue/v1/reservations/:id                   controllers.ReservationController.retrieveReservation(id: Long)
 PATCH  /noqueue/v1/reservations/:id                   controllers.ReservationController.patchReservation(id: Long)
 
+## This is to create contacts in our page
+POST  /noqueue/v1/contacts                      controllers.ContactController.addContact
+GET   /noqueue/v1/contacts                      controllers.ContactController.listContacts
+
 # Home page
 GET     /                           controllers.Application.index
 GET     /callback                   controllers.Callback.callback(code: Option[String])

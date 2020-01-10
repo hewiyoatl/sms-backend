@@ -39,7 +39,7 @@ object RestUserForm {
   )
 }
 
-class RestUserTableDef(tag: Tag) extends Table[RestUser](tag, "rest_user") {
+class RestUserTableDef(tag: Tag) extends Table[RestUser](tag, Some("nowaiting"),"rest_user") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
