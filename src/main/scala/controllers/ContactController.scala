@@ -4,7 +4,7 @@ import formatter._
 import javax.inject.Inject
 import models.{ContactTable, Contacts}
 import play.api.db.Database
-import play.api.libs.json.{JsResult, JsValue, Json}
+import play.api.libs.json.Json
 import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,6 +15,10 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
                                  (implicit context: ExecutionContext,
                                   database: Database,
                                   metrics: MetricsFacade) extends AbstractController(cc) {
+
+  val EMAIL_SUCCESS_URL = "http://www.talachitas.com/html/english/contact-us-success.html"
+
+  val EMAIL_FAILURE_URL = "http://www.talachitas.com/html/english/contact-us-error.html"
 
   implicit val contactReader = ContactFormatter.ContactReader
 
@@ -33,28 +37,32 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
   def addContact = Action.async { implicit request =>
 
     val body: AnyContent = request.body
-    val jsonBody: Option[JsValue] = body.asJson
+    val urlEncodedBody: Option[Map[String, Seq[String]]] = body.asFormUrlEncoded
 
-    jsonBody.map { json =>
+    urlEncodedBody.map { encodedBody =>
+      val emailOpt = encodedBody.get("email").map(_.mkString)
+      val subjectOpt = encodedBody.get("subject").map(_.mkString)
+      val messageOpt = encodedBody.get("message").map(_.mkString)
+      val phoneNumberOpt = encodedBody.get("phone").map(_.mkString)
 
-      val resultVal: JsResult[Contact] = json.validate[Contact]
-
-      resultVal.asOpt.map { contactInboud =>
+      emailOpt.map { email =>
 
         val contactUser = ContactTable(
-          contactInboud.email,
-          contactInboud.subject,
-          contactInboud.message)
+          emailOpt, subjectOpt, messageOpt, phoneNumberOpt)
 
         contactss.add(contactUser) map { contactOutbound =>
 
-          Created(Json.toJson(contactOutbound))
+          Redirect(EMAIL_SUCCESS_URL)
         }
+
       } getOrElse {
-        Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "new error"))))
+
+        Future(Redirect(EMAIL_FAILURE_URL))
       }
+
     } getOrElse {
-      Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "Error"))))
+
+      Future(Redirect(EMAIL_FAILURE_URL))
     }
   }
 
