@@ -29,6 +29,7 @@ PATCH  /noqueue/v1/reservations/:id                   controllers.ReservationCon
 ## This is to create contacts in our page
 POST  /noqueue/v1/contacts                      controllers.ContactController.addContact
 GET   /noqueue/v1/contacts                      controllers.ContactController.listContacts
+OPTIONS   /noqueue/v1/contacts                      controllers.OptionsController.options
 
 # Home page
 GET     /                           controllers.Application.index

@@ -119,4 +119,12 @@ object Util {
     SaveFormat.DOCX -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     SaveFormat.RTF -> "application/rtf", SaveFormat.TEXT -> "text/plain", SaveFormat.PNG -> "image/png",
     SaveFormat.JPEG -> "image/jpeg")
+
+  def headers = List(
+    "Access-Control-Allow-Origin" -> "*",
+    "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS, DELETE, PUT",
+    "Access-Control-Max-Age" -> "3600",
+    "Access-Control-Allow-Headers" -> "Origin, Content-Type, Accept, Authorization, access-control-allow-methods, access-control-allow-origin, access-control-allow-headers",
+    "Access-Control-Allow-Credentials" -> "true"
+  )
 }
