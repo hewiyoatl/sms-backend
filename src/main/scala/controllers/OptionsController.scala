@@ -18,4 +18,7 @@ class OptionsController @Inject()(cc: ControllerComponents, contactss: Contacts)
     NoContent.withHeaders(Util.headers : _*)
   }
 
+  def optionsString(email: String) = Action { request =>
+    NoContent.withHeaders(Util.headers : _*)
+  }
 }
