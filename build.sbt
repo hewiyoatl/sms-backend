@@ -61,6 +61,8 @@ libraryDependencies ++= Seq(
 //  "mysql" % "mysql-connector-java" % "5.1.34",
   //"org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.hsqldb" % "hsqldb" % "2.4.0",
+//  "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
+  "com.pauldijou" %% "jwt-play-json" % "4.2.0",
   "de.leanovate.play-mockws" %% "play-mockws" % "2.6.2" % Test)
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")

@@ -30,6 +30,7 @@ PATCH  /noqueue/v1/reservations/:id                   controllers.ReservationCon
 POST  /noqueue/v1/contacts                      controllers.ContactController.addContact
 GET   /noqueue/v1/contacts                      controllers.ContactController.listContacts
 OPTIONS   /noqueue/v1/contacts                      controllers.OptionsController.options
+DELETE /noqueue/v1/contacts/:email                     controllers.ContactController.deleteContact(email: String)
 
 # Home page
 GET     /                           controllers.Application.index

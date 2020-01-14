@@ -38,6 +38,11 @@ class Contacts @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
     Future(Option(Contact(contactUser.email, None, None, None)))
   }
 
+  def deleteContact(email: String): Future[Int] = {
+
+    db.run(contacts.filter(_.email === email).delete)
+  }
+
   class ContactTableDef(tag: Tag) extends Table[ContactTable](tag, Some("nowaiting"), "contact") {
 
     override def * =
