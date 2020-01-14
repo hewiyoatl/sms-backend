@@ -70,7 +70,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
   def deleteContact(email: String) = Action.async { implicit request =>
 
     contactss.deleteContact(email)
-    Future(NoContent)
+    Future(NoContent.withHeaders(Util.headers: _*))
   }
 
 }
