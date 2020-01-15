@@ -8,7 +8,7 @@ resolvers += Resolver.url(
 
 // Use the Play sbt plugin for Play projects
 //addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.5.4")
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.12")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.7.4")
 
 // to generate the sbt gen-idea project for intellij
 addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.6.0")

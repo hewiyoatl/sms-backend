@@ -3,7 +3,6 @@ package controllers
 import formatter._
 import javax.inject.Inject
 import models.{ContactTable, Contacts}
-import play.api.db.Database
 import play.api.libs.json.Json
 import play.api.mvc._
 import utilities.Util
@@ -14,7 +13,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
                                  (implicit context: ExecutionContext,
-                                  database: Database,
                                   metrics: MetricsFacade) extends AbstractController(cc) {
 
   val EMAIL_SUCCESS_URL = "http://www.talachitas.com/html/english/contact-us-success.html"

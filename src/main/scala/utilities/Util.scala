@@ -1,6 +1,6 @@
 package utilities
 
-import com.aspose.words.SaveFormat
+//import com.aspose.words.SaveFormat
 import com.kenshoo.play.metrics.Metrics
 import com.zaxxer.hikari.HikariDataSource
 import play.api.db.Database
@@ -112,13 +112,13 @@ object Util {
     } else s"""/$countryCodeLowerCase/$languageCodeLowerCase/interview/#/$interviewUuid?id=$templateUuid&document=$documentUuid"""
   }
 
-  val supportedFormats = Map("pdf" -> SaveFormat.PDF, "doc" -> SaveFormat.DOC, "docx" -> SaveFormat.DOCX,
-    "rtf" -> SaveFormat.RTF, "text" -> SaveFormat.TEXT, "png" -> SaveFormat.PNG, "jpeg" -> SaveFormat.JPEG)
-
-  val supportedContentType = Map(SaveFormat.PDF -> "application/pdf", SaveFormat.DOC -> "application/msword",
-    SaveFormat.DOCX -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    SaveFormat.RTF -> "application/rtf", SaveFormat.TEXT -> "text/plain", SaveFormat.PNG -> "image/png",
-    SaveFormat.JPEG -> "image/jpeg")
+//  val supportedFormats = Map("pdf" -> SaveFormat.PDF, "doc" -> SaveFormat.DOC, "docx" -> SaveFormat.DOCX,
+//    "rtf" -> SaveFormat.RTF, "text" -> SaveFormat.TEXT, "png" -> SaveFormat.PNG, "jpeg" -> SaveFormat.JPEG)
+//
+//  val supportedContentType = Map(SaveFormat.PDF -> "application/pdf", SaveFormat.DOC -> "application/msword",
+//    SaveFormat.DOCX -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+//    SaveFormat.RTF -> "application/rtf", SaveFormat.TEXT -> "text/plain", SaveFormat.PNG -> "image/png",
+//    SaveFormat.JPEG -> "image/jpeg")
 
   def headers = List(
     "Access-Control-Allow-Origin" -> "*",
