@@ -4,6 +4,15 @@
 
 #### Business Specs for Documents
 
+### To run the database locally
+``` java -classpath lib/hsqldb.jar org.hsqldb.server.Server --database.0 file:hsqldb/nowaiting --dbname.0 nowaiting ```
+```  java -classpath lib/hsqldb.jar org.hsqldb.server.Server ```
+
+
+### To run the scripts on the databse
+
+```  java -cp lib/hsqldb.jar org.hsqldb.util.DatabaseManagerSwing ```
+
 #### Build Locally 
 ```sbt run -Dhttp.port=10002```
 

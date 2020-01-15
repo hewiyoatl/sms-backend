@@ -1,18 +1,15 @@
 package controllers
 
-import javax.inject.Inject
-
 import formatter._
+import javax.inject.Inject
 import models.{RestUser, RestUsers}
-import play.api.db.Database
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class RestUserController @Inject()(cc: ControllerComponents, restUsers: RestUsers)
-                                  (implicit context: ExecutionContext,
-                                   database: Database) extends AbstractController(cc) {
+                                  (implicit context: ExecutionContext) extends AbstractController(cc) {
 
   implicit val RestUserReader = RestUserFormatter.RestUserReader
 

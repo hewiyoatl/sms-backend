@@ -23,6 +23,7 @@ disablePlugins(PlayLayoutPlugin)
 PlayKeys.playMonitoredFiles ++= (sourceDirectories in(Compile, TwirlKeys.compileTemplates)).value
 
 scalaVersion in ThisBuild := "2.11.8"
+//scalaVersion in ThisBuild := "2.13.1"
 
 resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
 resolvers += "Play2war plugins release" at "http://repository-play-war.forge.cloudbees.com/release/"
@@ -36,10 +37,10 @@ resolvers += "netty" at "https://mvnrepository.com/artifact/io.netty/netty-all"
 libraryDependencies ++= Seq(
   ws,
   filters,
-  jdbc,
+  //jdbc,
   guice,
   ehcache,
-  "org.playframework.anorm" %% "anorm" % "2.6.1",
+  "org.playframework.anorm" %% "anorm" % "2.6.4",
 //  "org.postgresql" % "postgresql" % "9.4.1209",
   //"io.swagger" %% "swagger-play2" % "1.6.0",
   //"com.typesafe.play" %% "anorm" % "2.5.0",
@@ -55,15 +56,15 @@ libraryDependencies ++= Seq(
   "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
   "io.prometheus" % "simpleclient_servlet" % "0.0.16",
   "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
-  "com.aspose" % "words" % "14.3.0",
+//  "com.aspose" % "words" % "14.3.0",
   specs2 % Test,
-  "com.typesafe.play" %% "play-slick" % "3.0.0",
+  "com.typesafe.play" %% "play-slick" % "4.0.2",
+  //"com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
 //  "mysql" % "mysql-connector-java" % "5.1.34",
   //"org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.hsqldb" % "hsqldb" % "2.4.0",
 //  "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
-  "com.pauldijou" %% "jwt-play-json" % "4.2.0",
-  "de.leanovate.play-mockws" %% "play-mockws" % "2.6.2" % Test)
+  "com.pauldijou" %% "jwt-play-json" % "4.2.0")
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 

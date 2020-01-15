@@ -2,8 +2,7 @@ package controllers
 
 import formatter._
 import javax.inject.Inject
-import models.{Reservations, Reservation}
-import play.api.db.Database
+import models.{Reservation, Reservations}
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc._
 
@@ -13,7 +12,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReservationController @Inject()(cc: ControllerComponents, reservations: Reservations)
                                      (implicit context: ExecutionContext,
-                                      database: Database,
                                       metrics: MetricsFacade) extends AbstractController(cc) {
 
   implicit val reservationReader = ReservationFormatter.ReservationReader
