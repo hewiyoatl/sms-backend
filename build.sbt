@@ -37,34 +37,19 @@ resolvers += "netty" at "https://mvnrepository.com/artifact/io.netty/netty-all"
 libraryDependencies ++= Seq(
   ws,
   filters,
-  //jdbc,
   guice,
   ehcache,
-  "org.playframework.anorm" %% "anorm" % "2.6.4",
-//  "org.postgresql" % "postgresql" % "9.4.1209",
-  //"io.swagger" %% "swagger-play2" % "1.6.0",
-  //"com.typesafe.play" %% "anorm" % "2.5.0",
-  //"org.scalaz" %% "scalaz-core" % "7.1.1",
-  //"org.apache.kafka" % "kafka_2.11" % "0.9.0.0",
-  //"net.cakesolutions" %% "scala-kafka-client" % "0.9.0.0",
-  //"net.cakesolutions" %% "scala-kafka-client-akka" % "0.9.0.0",
-  //"org.apache.kafka" % "kafka_2.11" % "0.10.0.0",
-  //"net.cakesolutions" %% "scala-kafka-client" % "0.10.0.0",
-  //"net.cakesolutions" %% "scala-kafka-client-akka" % "0.10.0.0",
   "nl.grons" %% "metrics-scala" % "3.5.4_a2.3",
   "io.prometheus" % "simpleclient" % "0.0.16",
   "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
   "io.prometheus" % "simpleclient_servlet" % "0.0.16",
   "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
-//  "com.aspose" % "words" % "14.3.0",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "4.0.2",
-  //"com.typesafe.play" %% "play-slick-evolutions" % "4.0.2",
-//  "mysql" % "mysql-connector-java" % "5.1.34",
-  //"org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test,
   "org.hsqldb" % "hsqldb" % "2.4.0",
-//  "com.jason-goodwin" %% "authentikat-jwt" % "0.4.5",
-  "com.pauldijou" %% "jwt-play-json" % "4.2.0")
+  "com.pauldijou" %% "jwt-play" % "0.19.0",
+  "com.pauldijou" %% "jwt-core" % "0.19.0",
+  "com.auth0" % "jwks-rsa" % "0.6.1")
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 
