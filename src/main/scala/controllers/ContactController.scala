@@ -1,5 +1,6 @@
 package controllers
 
+import auth.AuthAction
 import formatter._
 import javax.inject.Inject
 import models.{ContactTable, Contacts}
@@ -13,7 +14,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
                                  (implicit context: ExecutionContext,
-                                  metrics: MetricsFacade) extends AbstractController(cc) {
+                                  metrics: MetricsFacade,
+                                  authAction: AuthAction) extends AbstractController(cc) {
 
   val EMAIL_SUCCESS_URL = "http://www.talachitas.com/html/english/contact-us-success.html"
 
@@ -25,7 +27,11 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
   implicit val errorWriter = ErrorFormatter.errorWriter
 
-  def listContacts = Action.async { implicit request =>
+  def ping = authAction { implicit request =>
+    Ok("Hello, Scala!")
+  }
+
+  def listContacts = authAction.async { implicit request =>
     contactss.listContacts map { contacts =>
 
       Ok(Json.toJson(contacts)).withHeaders(Util.headers: _*)
@@ -33,7 +39,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
   }
 
-  def addContact = Action.async { implicit request =>
+  def addContact = authAction.async { implicit request =>
 
     val body: AnyContent = request.body
     val urlEncodedBody: Option[Map[String, Seq[String]]] = body.asFormUrlEncoded
@@ -65,7 +71,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
     }
   }
 
-  def deleteContact(email: String) = Action.async { implicit request =>
+  def deleteContact(email: String) = authAction.async { implicit request =>
 
     contactss.deleteContact(email)
     Future(NoContent.withHeaders(Util.headers: _*))

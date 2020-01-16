@@ -33,6 +33,10 @@ OPTIONS   /noqueue/v1/contacts                      controllers.OptionsControlle
 OPTIONS   /noqueue/v1/contacts/:email                      controllers.OptionsController.optionsString(email: String)
 DELETE /noqueue/v1/contacts/:email                     controllers.ContactController.deleteContact(email: String)
 
+GET /noqueue/v1/contacts/ping                     controllers.ContactController.ping
+
+POST /noqueue/v1/token                          controllers.TokenController.provideToken
+
 # Home page
 GET     /                           controllers.Application.index
 GET     /callback                   controllers.Callback.callback(code: Option[String])
