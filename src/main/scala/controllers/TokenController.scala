@@ -45,11 +45,11 @@ class TokenController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
       if (response.status >= 200 && response.status < 300) {
 
-        Ok(response.json)
+        Ok(response.json).withHeaders(Util.headers: _*)
       }
       else {
 
-        InternalServerError("Error")
+        InternalServerError("Error").withHeaders(Util.headers: _*)
       }
 
     }

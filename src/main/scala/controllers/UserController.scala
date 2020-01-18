@@ -29,14 +29,17 @@ class UserController @Inject()(cc: ControllerComponents, users: Users)
         userOpt map { user =>
 
           Ok(Json.obj("user_id" -> user.id, "nickname" -> user.nickname, "email" -> user.email))
+            .withHeaders(Util.headers: _*)
 
-        } getOrElse (Forbidden(Json.toJson(Error(FORBIDDEN, "Unauthorized user"))))
+        } getOrElse (Forbidden(Json.toJson(Error(FORBIDDEN, "Unauthorized user")))
+          .withHeaders(Util.headers: _*))
 
       }
 
     } getOrElse {
 
-      Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "Missing authorization header"))))
+      Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "Missing authorization header")))
+        .withHeaders(Util.headers: _*))
     }
 
   }
