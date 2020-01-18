@@ -27,6 +27,10 @@ object Util {
    */
   val EMPTY_JSON: String = "{}"
 
+  val basicUser = "info@talachitas.com"
+
+  val basicPassword = "Me gustan las chinas"
+
   /**
    * Utility method to validate that all the characters of a string are digits.
    *
@@ -127,4 +131,11 @@ object Util {
     "Access-Control-Allow-Headers" -> "Origin, Content-Type, Accept, Authorization, access-control-allow-methods, access-control-allow-origin, access-control-allow-headers",
     "Access-Control-Allow-Credentials" -> "true"
   )
+
+  def decodeBasicAuth(authHeader: String): (String, String) = {
+    val baStr = authHeader.replaceFirst("Basic ", "")
+    val decoded = new sun.misc.BASE64Decoder().decodeBuffer(baStr)
+    val Array(user, password) = new String(decoded).split(":")
+    (user, password)
+  }
 }

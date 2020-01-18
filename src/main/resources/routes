@@ -35,7 +35,9 @@ DELETE /noqueue/v1/contacts/:email                     controllers.ContactContro
 
 GET /noqueue/v1/contacts/ping                     controllers.ContactController.ping
 
-POST /noqueue/v1/token                          controllers.TokenController.provideToken
+GET /noqueue/v1/token                          controllers.TokenController.provideToken
+
+GET /noqueue/v1/login/profile                   controllers.UserController.profile
 
 # Home page
 GET     /                           controllers.Application.index

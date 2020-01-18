@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import formatter.{Error, ErrorFormatter, UserFormatter, UserInbound}
-import model.Users
+import model.Clients
 import play.api.Configuration
 import play.api.cache.SyncCacheApi
 import play.api.libs.json.{JsResult, JsValue, Json}
@@ -12,7 +12,7 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ClientController @Inject()(cc: ControllerComponents, users: Users)
+class ClientController @Inject()(cc: ControllerComponents, users: Clients)
                                 (implicit context: ExecutionContext,
                                  config: Configuration,
                                  metrics: MetricsFacade,
@@ -46,7 +46,7 @@ class ClientController @Inject()(cc: ControllerComponents, users: Users)
 
         resultVal.asOpt.map { userInboud =>
 
-          val newUser = model.User(
+          val newUser = model.Client(
             None,
             userInboud.firstName,
             userInboud.lastName,
@@ -72,7 +72,7 @@ class ClientController @Inject()(cc: ControllerComponents, users: Users)
   }
 
   def retrieveUser(id: Long) = Action.async { implicit request =>
-    users.retrieveUser(id) map { user =>
+    users.retrieveClient(id) map { user =>
 
       Ok(Json.toJson(user))
     }
@@ -90,7 +90,7 @@ class ClientController @Inject()(cc: ControllerComponents, users: Users)
 
         resultVal.asOpt.map { userInboud =>
 
-          val patchUser = model.User(
+          val patchUser = model.Client(
             Some(id),
             userInboud.firstName,
             userInboud.lastName,
@@ -98,7 +98,7 @@ class ClientController @Inject()(cc: ControllerComponents, users: Users)
             userInboud.email,
             false)
 
-          users.patchUser(patchUser) map { user =>
+          users.patchClient(patchUser) map { user =>
 
             Ok(Json.toJson(user))
           }

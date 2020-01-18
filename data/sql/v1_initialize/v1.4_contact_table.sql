@@ -6,3 +6,8 @@ CREATE TABLE "nowaiting"."contact" (
   "phone"           varchar(500)
 );
 
+create table "nowaiting"."users" (
+"id" identity primary key,
+"email"  varchar(1000),
+"nickname" varchar(1000),
+"password" varchar(1000))
