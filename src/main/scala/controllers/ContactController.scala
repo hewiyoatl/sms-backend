@@ -17,9 +17,14 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
                                   metrics: MetricsFacade,
                                   authAction: AuthAction) extends AbstractController(cc) {
 
-  val EMAIL_SUCCESS_URL = "http://www.talachitas.com/html/english/contact-us-success.html"
+  val DEFAULT_LANGUAGE = "en"
+  val ENGLISH_DOMAIN = "https://www.talachitas.com/talachitas/html/english/"
+  val ENGLISH_SUCCESS_PAGE = "contact-us-success.html"
+  val ENGLISH_FAILURE_PAGE = "contact-us-error.html"
+  val ENGLISH_EMAIL_SUCCESS_URL = ENGLISH_DOMAIN + ENGLISH_SUCCESS_PAGE
+  val ENGLISH_EMAIL_FAILURE_URL = ENGLISH_DOMAIN + ENGLISH_FAILURE_PAGE
 
-  val EMAIL_FAILURE_URL = "http://www.talachitas.com/html/english/contact-us-error.html"
+  val SPANISH_DOMAIN = "https://www.talachitas.com/talachitas/html/spanish/"
 
   implicit val contactReader = ContactFormatter.ContactReader
 
@@ -27,8 +32,9 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
   implicit val errorWriter = ErrorFormatter.errorWriter
 
-  def ping = authAction { implicit request =>
-    Ok("Hello, Scala!")
+  def ping = authAction.async { implicit request =>
+
+    Future(Ok("Hello, Scala!"))
   }
 
   def listContacts = authAction.async { implicit request =>
@@ -39,16 +45,40 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
   }
 
+  private def redirectSuccess(languageOpt: Option[String]): Result = {
+
+    languageOpt.map(lang =>
+      if(lang == "sp")
+        Redirect(ENGLISH_EMAIL_SUCCESS_URL)
+      else
+        Redirect(ENGLISH_EMAIL_SUCCESS_URL))
+      .getOrElse(Redirect(ENGLISH_EMAIL_SUCCESS_URL))
+
+  }
+
+  private def redirectFailure(languageOpt: Option[String]): Result = {
+
+    languageOpt.map(lang =>
+      if(lang == "sp")
+        Redirect(ENGLISH_EMAIL_FAILURE_URL)
+      else
+        Redirect(ENGLISH_EMAIL_FAILURE_URL))
+      .getOrElse(Redirect(ENGLISH_EMAIL_FAILURE_URL))
+
+  }
+
   def addContact = Action.async { implicit request =>
 
     val body: AnyContent = request.body
     val urlEncodedBody: Option[Map[String, Seq[String]]] = body.asFormUrlEncoded
 
     urlEncodedBody.map { encodedBody =>
-      val emailOpt = encodedBody.get("email").map(_.mkString)
+      // we do not accept empty string
+      val emailOpt = encodedBody.get("email").map(_.mkString).filter(_ != "")
       val subjectOpt = encodedBody.get("subject").map(_.mkString)
       val messageOpt = encodedBody.get("message").map(_.mkString)
       val phoneNumberOpt = encodedBody.get("phone").map(_.mkString)
+      val languageOpt = encodedBody.get("language").map(_.mkString).orElse(Some(DEFAULT_LANGUAGE))
 
       emailOpt.map { email =>
 
@@ -57,17 +87,18 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
         contactss.add(contactUser) map { contactOutbound =>
 
-          Redirect(EMAIL_SUCCESS_URL)
+          redirectSuccess(languageOpt)
+
         }
 
       } getOrElse {
 
-        Future(Redirect(EMAIL_FAILURE_URL))
+        Future(redirectFailure(languageOpt))
       }
 
     } getOrElse {
 
-      Future(Redirect(EMAIL_FAILURE_URL))
+      Future(redirectFailure(Some(DEFAULT_LANGUAGE)))
     }
   }
 
