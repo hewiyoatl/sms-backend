@@ -39,7 +39,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
   }
 
-  def addContact = authAction.async { implicit request =>
+  def addContact = Action.async { implicit request =>
 
     val body: AnyContent = request.body
     val urlEncodedBody: Option[Map[String, Seq[String]]] = body.asFormUrlEncoded
