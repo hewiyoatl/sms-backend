@@ -1,12 +1,3 @@
-###
-#  summary: create a card
-#  responses:
-#    200:
-#      description: success
-###
-GET /noqueue/v1/contacts/ping                     controllers.ContactController.ping
-
-
 # Home page
 GET     /noqueue/v1/users                       controllers.ClientController.listUsers
 POST    /noqueue/v1/users                       controllers.ClientController.addUser
