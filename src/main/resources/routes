@@ -42,7 +42,8 @@ GET /talachitas/v1/contacts/ping                     controllers.ContactControll
 #GET /talachitas/v1/token                          controllers.TokenController.provideToken
 #OPTIONS /talachitas/v1/token                          controllers.OptionsController.options
 
-GET /talachitas/v1/login/profile                   controllers.UserController.profile
+GET      /talachitas/v1/login/profile                   controllers.UserController.profile
+OPTIONS  /talachitas/v1/login/profile                   controllers.OptionsController.options
 
 POST /talachitas/v1/users                       controllers.UserController.addUser
 
