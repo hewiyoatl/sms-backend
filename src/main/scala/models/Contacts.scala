@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import formatter.Contact
 import play.api.Logger
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.jdbc.PostgresProfile.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -45,7 +45,7 @@ class Contacts @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends H
     db.run(contacts.filter(_.email === email).delete)
   }
 
-  class ContactTableDef(tag: Tag) extends Table[ContactTable](tag, Some("nowaiting"), "contact") {
+  class ContactTableDef(tag: Tag) extends Table[ContactTable](tag, Some("talachitas"), "contact") {
 
     override def * =
       (email, subject, message, phoneNumber) <> (ContactTable.tupled, ContactTable.unapply)

@@ -8,6 +8,9 @@
 ``` java -classpath lib/hsqldb.jar org.hsqldb.server.Server --database.0 file:hsqldb/nowaiting --dbname.0 nowaiting ```
 ```  java -classpath lib/hsqldb.jar org.hsqldb.server.Server ```
 
+### install xamp
+```https://www.dyclassroom.com/howto-mac/how-to-install-apache-mysql-php-on-macos-mojave-10-14```
+
 
 ### To run the scripts on the databse
 
