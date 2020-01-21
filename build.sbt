@@ -30,17 +30,18 @@ libraryDependencies ++= Seq(
   filters,
   guice,
   ehcache,
-  //metrics for database
+  //metrics for database connections
   "nl.grons" %% "metrics-scala" % "3.5.4_a2.3",
+  "com.kenshoo" %% "metrics-play" % "2.7.0_0.8.0",
   "io.prometheus" % "simpleclient" % "0.0.16",
   "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
   "io.prometheus" % "simpleclient_servlet" % "0.0.16",
   "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
+  "mysql" % "mysql-connector-java" % "5.1.34",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "4.0.2",
-  "org.hsqldb" % "hsqldb" % "2.4.0",
-  "com.pauldijou" %% "jwt-play" % "0.19.0",
-  "com.kenshoo" %% "metrics-play" % "2.7.0_0.8.0")
+  //"org.hsqldb" % "hsqldb" % "2.4.0",
+  "com.pauldijou" %% "jwt-play" % "0.19.0")
 //  "com.pauldijou" %% "jwt-core" % "0.19.0",
 //  "com.auth0" % "jwks-rsa" % "0.6.1")
 

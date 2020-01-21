@@ -5,13 +5,15 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 import utilities.Util
 
-class RLCorsFilter @Inject() (implicit ec: ExecutionContext, configuration: play.api.Configuration) extends EssentialFilter {
+class RLCorsFilter @Inject() (implicit ec: ExecutionContext,
+                              configuration: play.api.Configuration,
+                              util: Util) extends EssentialFilter {
 
   def apply(next: EssentialAction) = new EssentialAction {
 
     def apply(requestHeader: RequestHeader) = {
       next(requestHeader).map { result =>
-        Util.enableCors(result)
+        util.enableCors(result)
       }
     }
   }

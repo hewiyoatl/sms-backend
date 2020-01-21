@@ -12,8 +12,9 @@ class LanguageSupportController @Inject()(cc: ControllerComponents)
                                          (implicit context: ExecutionContext,
                                           database: Database,
                                           metrics: MetricsFacade,
-                                          messagesApi: MessagesApi) extends AbstractController(cc) with I18nSupport  {
+                                          messagesApi: MessagesApi,
+                                          util: Util) extends AbstractController(cc) with I18nSupport  {
   def index = Action { request =>
-    Ok(Util.languageSupport(messagesApi, "welcome.index", "usuario")(request))
+    Ok(util.languageSupport(messagesApi, "welcome.index", "usuario")(request))
   }
 }

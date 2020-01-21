@@ -1,13 +1,24 @@
 package utilities
 
-//import com.aspose.words.SaveFormat
+import java.security.spec.{ECParameterSpec, ECPrivateKeySpec}
+import java.security.{KeyFactory, PrivateKey}
+
 import com.kenshoo.play.metrics.Metrics
 import com.zaxxer.hikari.HikariDataSource
+import javax.inject.Inject
+import models.UserOutbound
+import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.jce.spec.ECNamedCurveSpec
+import org.joda.time.DateTime
+import pdi.jwt.{Jwt, JwtAlgorithm}
+import play.api.Configuration
 import play.api.db.Database
-import play.api.i18n.{MessagesApi, Lang}
+import play.api.i18n.{Lang, MessagesApi}
+import play.api.libs.json.{JsObject, JsString, Json}
 import play.api.mvc._
 
-object Util {
+class Util @Inject()(config: Configuration) {
 
   /**
    * This variable is used to check the request param
@@ -30,6 +41,30 @@ object Util {
   val basicUser = "info@talachitas.com"
 
   val basicPassword = "Me gustan las chinas"
+
+  val privateKey: PrivateKey = {
+
+    val S = BigInt(s, 16)
+    val curveParams = ECNamedCurveTable.getParameterSpec("P-521")
+    val curveSpec: ECParameterSpec = new ECNamedCurveSpec(
+      "P-521",
+      curveParams.getCurve(),
+      curveParams.getG(),
+      curveParams.getN(),
+      curveParams.getH())
+
+    val privateSpec = new ECPrivateKeySpec(S.underlying(), curveSpec)
+    import java.security.Security
+    Security.addProvider(new BouncyCastleProvider)
+    val privateKeyEC = KeyFactory.getInstance("ECDSA", "BC").generatePrivate(privateSpec)
+
+    privateKeyEC
+
+  }
+
+  private def s = config.get[String]("auth.s")
+
+  private def expiration = config.get[Int]("auth.expiration")
 
   /**
    * Utility method to validate that all the characters of a string are digits.
@@ -116,14 +151,6 @@ object Util {
     } else s"""/$countryCodeLowerCase/$languageCodeLowerCase/interview/#/$interviewUuid?id=$templateUuid&document=$documentUuid"""
   }
 
-//  val supportedFormats = Map("pdf" -> SaveFormat.PDF, "doc" -> SaveFormat.DOC, "docx" -> SaveFormat.DOCX,
-//    "rtf" -> SaveFormat.RTF, "text" -> SaveFormat.TEXT, "png" -> SaveFormat.PNG, "jpeg" -> SaveFormat.JPEG)
-//
-//  val supportedContentType = Map(SaveFormat.PDF -> "application/pdf", SaveFormat.DOC -> "application/msword",
-//    SaveFormat.DOCX -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-//    SaveFormat.RTF -> "application/rtf", SaveFormat.TEXT -> "text/plain", SaveFormat.PNG -> "image/png",
-//    SaveFormat.JPEG -> "image/jpeg")
-
   def headers = List(
     "Access-Control-Allow-Origin" -> "*",
     "Access-Control-Allow-Methods" -> "GET, POST, OPTIONS, DELETE, PUT",
@@ -137,5 +164,27 @@ object Util {
     val decoded = new sun.misc.BASE64Decoder().decodeBuffer(baStr)
     val Array(user, password) = new String(decoded).split(":")
     (user, password)
+  }
+
+  def provideToken(user: UserOutbound): JsObject = {
+
+    val token = Jwt.encode(
+      s"""{"email":"${user.email.getOrElse("")}",
+         |"first_name":"${user.firstName.getOrElse("")}",
+         |"last_name":"${user.lastName.getOrElse("")}",
+         |"roles": ${user.roles.getOrElse(List())},
+         |"exp": ${(new DateTime()).plusSeconds(expiration).getMillis},
+         |"iat": ${System.currentTimeMillis()}}""".stripMargin,
+      privateKey,
+      JwtAlgorithm.ES512)
+
+    Json.obj(
+      "email" -> user.email.map(JsString(_)),
+      "first_name" -> user.firstName.map(JsString(_)),
+      "last_name" -> user.lastName.map(JsString(_)),
+      "roles" -> Json.toJson(user.roles.map(x => x).getOrElse(List())),
+      "nickname" -> user.nickname.map(JsString(_)),
+      "bearer_token" -> token)
+
   }
 }

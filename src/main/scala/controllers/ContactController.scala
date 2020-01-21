@@ -1,9 +1,10 @@
 package controllers
 
-import auth.AuthAction
+import auth.AuthUserAction
 import formatter._
 import javax.inject.Inject
 import models.{ContactTable, Contacts}
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc._
 import utilities.Util
@@ -15,7 +16,9 @@ import scala.concurrent.{ExecutionContext, Future}
 class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
                                  (implicit context: ExecutionContext,
                                   metrics: MetricsFacade,
-                                  authAction: AuthAction) extends AbstractController(cc) {
+                                  authUserAction: AuthUserAction,
+                                  config: Configuration,
+                                  util: Util) extends AbstractController(cc) {
 
   val DEFAULT_LANGUAGE = "en"
   val ENGLISH_DOMAIN = "https://www.talachitas.com/talachitas/html/english/"
@@ -32,15 +35,16 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
 
   implicit val errorWriter = ErrorFormatter.errorWriter
 
-  def ping = authAction.async { implicit request =>
+  def ping = authUserAction.async { implicit request =>
 
     Future(Ok("Hello, Scala!"))
   }
 
-  def listContacts = Action.async { implicit request =>
+  def listContacts = authUserAction.async { implicit request =>
+
     contactss.listContacts map { contacts =>
 
-      Ok(Json.toJson(contacts)).withHeaders(Util.headers: _*)
+      Ok(Json.toJson(contacts)).withHeaders(util.headers: _*)
     }
 
   }
@@ -102,10 +106,10 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
     }
   }
 
-  def deleteContact(email: String) = authAction.async { implicit request =>
+  def deleteContact(email: String) = authUserAction.async { implicit request =>
 
     contactss.deleteContact(email)
-    Future(NoContent.withHeaders(Util.headers: _*))
+    Future(NoContent.withHeaders(util.headers: _*))
   }
 
 }
