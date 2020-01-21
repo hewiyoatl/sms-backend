@@ -3,20 +3,21 @@ package models
 import com.google.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 //import slick.driver.PostgresDriver.api._
-import slick.driver.MySQLDriver.api._
+//import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-case class User(id: Option[Long],
-                email: String,
-                nickname: Option[String],
-                password: String,
-                firstName: String,
-                lastName: String,
-                phoneNumber: Option[String],
-                roles: String)
+case class UserIn(id: Option[Long],
+                  email: String,
+                  nickname: Option[String],
+                  password: String,
+                  firstName: String,
+                  lastName: String,
+                  phoneNumber: Option[String],
+                  roles: String)
 
 case class UserOutbound(id: Option[Long],
                         email: Option[String],
@@ -41,7 +42,7 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
 //    ))
 //  }
 
-  def addUser(user: User): Future[Option[UserOutbound]] = {
+  def addUser(user: UserIn): Future[Option[UserOutbound]] = {
 
     db.run(
       (users += user).transactionally)
@@ -99,9 +100,9 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
 //    db.run(users.filter(_.email === email).delete)
 //  }
 
-  class UsersTableDef(tag: Tag) extends Table[User](tag, Some("talachitas"), "users") {
+  class UsersTableDef(tag: Tag) extends Table[UserIn](tag, Some("talachitas"), "users") {
 
-    override def * = (id, email, nickname, password, firstName, lastName, phoneNumber, roles) <> (User.tupled, User.unapply)
+    override def * = (id, email, nickname, password, firstName, lastName, phoneNumber, roles) <> (UserIn.tupled, UserIn.unapply)
 
     def id = column[Option[Long]]("id", O.PrimaryKey)
 

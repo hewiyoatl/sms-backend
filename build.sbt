@@ -3,21 +3,11 @@ import scoverage.ScoverageKeys
 
 name := "no-waiting-backend"
 
-lazy val metricsPlayVersion = "d1a2b66"
-
-lazy val metricsPlay =
-  ProjectRef(uri(s"ssh://git@github.com/rocketlawyer/metrics-play.git#$metricsPlayVersion"), "metrics-play")
-
-lazy val swaggerPlayVersion = "8753630"
-
-lazy val swaggerPlay25 =
-  ProjectRef(uri(s"ssh://git@github.com/rocketlawyer/swagger-play.git#$swaggerPlayVersion"), "root")
-
 lazy val root = (project in file(".")).settings(
   bashScriptExtraDefines ++= Seq(
     "export LC_ALL=C.UTF-8",
     "export LANG=C.UTF-8"
-  )).enablePlugins(PlayScala, PlayNettyServer).disablePlugins(PlayAkkaHttpServer).dependsOn(metricsPlay).dependsOn(swaggerPlay25)
+  )).enablePlugins(PlayScala, PlayNettyServer).disablePlugins(PlayAkkaHttpServer)
 
 disablePlugins(PlayLayoutPlugin)
 PlayKeys.playMonitoredFiles ++= (sourceDirectories in(Compile, TwirlKeys.compileTemplates)).value
@@ -30,31 +20,32 @@ resolvers += "Play2war plugins release" at "http://repository-play-war.forge.clo
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases/"
 resolvers += "sonatype-releases" at "https://oss.sonatype.org/content/repositories/releases/"
 resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
-resolvers += "Rocketlawyer Snapshots" at "http://f1tst-linbld100/nexus/content/repositories/snapshots"
-resolvers += "Rocketlawyer Releases" at "http://f1tst-linbld100/nexus/content/repositories/releases"
-resolvers += "netty" at "https://mvnrepository.com/artifact/io.netty/netty-all"
+
+//resolvers += "Rocketlawyer Snapshots" at "http://f1tst-linbld100/nexus/content/repositories/snapshots"
+//resolvers += "Rocketlawyer Releases" at "http://f1tst-linbld100/nexus/content/repositories/releases"
+//resolvers += "netty" at "https://mvnrepository.com/artifact/io.netty/netty-all"
 
 libraryDependencies ++= Seq(
   ws,
   filters,
   guice,
   ehcache,
+  //metrics for database connections
   "nl.grons" %% "metrics-scala" % "3.5.4_a2.3",
-  "mysql" % "mysql-connector-java" % "5.1.34",
+  "com.kenshoo" %% "metrics-play" % "2.7.0_0.8.0",
   "io.prometheus" % "simpleclient" % "0.0.16",
   "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
   "io.prometheus" % "simpleclient_servlet" % "0.0.16",
   "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
+  "mysql" % "mysql-connector-java" % "5.1.34",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "4.0.2",
-//  "org.hsqldb" % "hsqldb" % "2.4.0",
-//  "org.bouncycastle" % "bcprov-jdk15on" % "1.64"
-  "com.pauldijou" %% "jwt-play" % "0.19.0"
-//  "com.pauldijou" %% "jwt-core" % "0.19.0"
-//  "com.auth0" % "jwks-rsa" % "0.6.1"
-)
+  //"org.hsqldb" % "hsqldb" % "2.4.0",
+  "com.pauldijou" %% "jwt-play" % "0.19.0")
+//  "com.pauldijou" %% "jwt-core" % "0.19.0",
+//  "com.auth0" % "jwks-rsa" % "0.6.1")
 
-unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
+//unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 
 // disable .jar publishing
 publishArtifact in (Compile, packageBin) := false
@@ -124,7 +115,7 @@ def getConfig: com.typesafe.config.Config = {
 enablePlugins(JavaAppPackaging)
 
 //microservice plugin for mini kubernetus
-enablePlugins(DirectoryMicroservice)
+//enablePlugins(DirectoryMicroservice)
 
 // for the standalone jar
 assemblyMergeStrategy in assembly := {

@@ -8,6 +8,9 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 
 class LoggingFilter @Inject() (implicit ec: ExecutionContext) extends EssentialFilter {
+
+  val logger: Logger = Logger(this.getClass())
+
   def apply(nextFilter: EssentialAction) = new EssentialAction {
     def apply(requestHeader: RequestHeader) = {
 
@@ -19,7 +22,7 @@ class LoggingFilter @Inject() (implicit ec: ExecutionContext) extends EssentialF
 
         val endTime = System.currentTimeMillis
         val requestTime = endTime - startTime
-        Logger.info(s"${requestHeader.contentType} ${requestHeader.headers} ${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
+        logger.info(s"${requestHeader.contentType} ${requestHeader.headers} ${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
         result.withHeaders("Request-Time" -> requestTime.toString)
 
       }

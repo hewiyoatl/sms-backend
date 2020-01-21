@@ -1,3 +1,7 @@
+### to measure metrics by endpoint
+## https://github.com/kenshoo/metrics-play
+GET     /admin/metrics              com.kenshoo.play.metrics.MetricsController.metrics
+
 # Home page
 GET     /noqueue/v1/users                       controllers.ClientController.listUsers
 POST    /noqueue/v1/users                       controllers.ClientController.addUser
@@ -38,7 +42,8 @@ GET /talachitas/v1/contacts/ping                     controllers.ContactControll
 #GET /talachitas/v1/token                          controllers.TokenController.provideToken
 #OPTIONS /talachitas/v1/token                          controllers.OptionsController.options
 
-GET /talachitas/v1/login/profile                   controllers.UserController.profile
+GET      /talachitas/v1/login/profile                   controllers.UserController.profile
+OPTIONS  /talachitas/v1/login/profile                   controllers.OptionsController.options
 
 POST /talachitas/v1/users                       controllers.UserController.addUser
 

@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.driver.HsqldbDriver
 import slick.jdbc.JdbcProfile
 
@@ -38,7 +38,7 @@ object ClientForm {
   )
 }
 
-class ClientTableDef(tag: Tag) extends Table[Client](tag, Some("nowaiting"), "client") {
+class ClientTableDef(tag: Tag) extends Table[Client](tag, Some("talachitas"), "client") {
 
   override def * =
     (id, firstName, lastName, mobile, email, deleted) <> (Client.tupled, Client.unapply)

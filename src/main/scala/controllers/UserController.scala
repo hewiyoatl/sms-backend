@@ -2,10 +2,10 @@ package controllers
 
 import formatter.{Error, ErrorFormatter}
 import javax.inject.Inject
-import models.{User, Users}
+import models.{UserIn, Users}
+import play.api.Configuration
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
-import play.api.{Configuration, Logger}
 import play.mvc.Http.HeaderNames
 import utilities.Util
 
@@ -66,7 +66,7 @@ class UserController @Inject()(cc: ControllerComponents, users: Users, config: C
 
           lastNameOpt.map { lastName =>
 
-            val newUser = User(None, email, nicknameOpt, passwordOpt.getOrElse(""), firstName, lastName, phoneOpt, "Client")
+            val newUser = UserIn(None, email, nicknameOpt, passwordOpt.getOrElse(""), firstName, lastName, phoneOpt, "Client")
 
             users.addUser(newUser) map { userOutbound =>
 

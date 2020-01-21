@@ -3,7 +3,7 @@ package utilities
 import java.sql.Date
 
 import org.joda.time.DateTime
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
 object DateTimeMapper {
 

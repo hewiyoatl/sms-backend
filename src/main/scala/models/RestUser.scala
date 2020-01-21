@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,7 +39,7 @@ object RestUserForm {
   )
 }
 
-class RestUserTableDef(tag: Tag) extends Table[RestUser](tag, Some("nowaiting"),"rest_user") {
+class RestUserTableDef(tag: Tag) extends Table[RestUser](tag, Some("talachitas"),"rest_user") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 

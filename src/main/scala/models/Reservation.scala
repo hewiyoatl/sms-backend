@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.PostgresDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcProfile
 import utilities.DateTimeMapper._
 import utilities.MaybeFilter
@@ -41,7 +41,7 @@ object ReservationForm {
   )
 }
 
-class ReservationTableDef(tag: Tag) extends Table[Reservation](tag, Some("nowaiting"), "reservation") {
+class ReservationTableDef(tag: Tag) extends Table[Reservation](tag, Some("talachitas"), "reservation") {
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
