@@ -40,16 +40,19 @@ libraryDependencies ++= Seq(
   guice,
   ehcache,
   "nl.grons" %% "metrics-scala" % "3.5.4_a2.3",
+  "mysql" % "mysql-connector-java" % "5.1.34",
   "io.prometheus" % "simpleclient" % "0.0.16",
   "io.prometheus" % "simpleclient_hotspot" % "0.0.16",
   "io.prometheus" % "simpleclient_servlet" % "0.0.16",
   "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "4.0.2",
-  "org.hsqldb" % "hsqldb" % "2.4.0",
-  "com.pauldijou" %% "jwt-play" % "0.19.0",
-//  "com.pauldijou" %% "jwt-core" % "0.19.0",
-  "com.auth0" % "jwks-rsa" % "0.6.1")
+//  "org.hsqldb" % "hsqldb" % "2.4.0",
+//  "org.bouncycastle" % "bcprov-jdk15on" % "1.64"
+  "com.pauldijou" %% "jwt-play" % "0.19.0"
+//  "com.pauldijou" %% "jwt-core" % "0.19.0"
+//  "com.auth0" % "jwks-rsa" % "0.6.1"
+)
 
 unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 

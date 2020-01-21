@@ -1,10 +1,9 @@
 package models
 
 import com.google.inject.Inject
-import formatter.Contact
-import play.api.Logger
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.PostgresDriver.api._
+//import slick.driver.PostgresDriver.api._
+import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,11 +12,20 @@ import scala.concurrent.Future
 case class User(id: Option[Long],
                 email: String,
                 nickname: Option[String],
-                password: String)
+                password: String,
+                firstName: String,
+                lastName: String,
+                phoneNumber: Option[String],
+                roles: String)
 
 case class UserOutbound(id: Option[Long],
                         email: Option[String],
-                        nickname: Option[String])
+                        nickname: Option[String],
+                        firstName: Option[String],
+                        lastName: Option[String],
+                        phoneNumber: Option[String],
+                        roles: Option[List[String]],
+                        bearerToken: Option[String])
 
 class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
@@ -33,13 +41,21 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
 //    ))
 //  }
 
-//  def add(user: User): Future[Option[User]] = {
-//
-//    db.run(
-//      (users += user).transactionally)
-//
-//    Future(Option(User(user.email, Option(""), "")))
-//  }
+  def addUser(user: User): Future[Option[UserOutbound]] = {
+
+    db.run(
+      (users += user).transactionally)
+
+    Future(Option(UserOutbound(
+      None,
+      Option(user.email),
+      user.nickname,
+      Option(user.firstName),
+      Option(user.lastName),
+      user.phoneNumber,
+      Option(List(user.roles)),
+      None)))
+  }
 
 
   def retrieveUser(email: String, password: String): Future[Option[UserOutbound]] = {
@@ -48,17 +64,31 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
       (
         user.id,
         user.email,
-        user.nickname
+        user.nickname,
+        user.firstName,
+        user.lastName,
+        user.phoneNumber,
+        user.roles
       )).result.map(
       _.headOption.map {
         case (
           id,
           email,
-          nickname) =>
+          nickname,
+          firstName,
+          lastName,
+          phoneNumber,
+          roles) =>
           UserOutbound(
             id,
             Option(email),
-            nickname)
+            nickname,
+            Option(firstName),
+            Option(lastName),
+            phoneNumber,
+            Option(List(roles)),
+            None
+          )
       }
     ))
 
@@ -69,10 +99,9 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
 //    db.run(users.filter(_.email === email).delete)
 //  }
 
-  class UsersTableDef(tag: Tag) extends Table[User](tag, Some("nowaiting"), "users") {
+  class UsersTableDef(tag: Tag) extends Table[User](tag, Some("talachitas"), "users") {
 
-    override def * =
-      (id, email, nickname, password) <> (User.tupled, User.unapply)
+    override def * = (id, email, nickname, password, firstName, lastName, phoneNumber, roles) <> (User.tupled, User.unapply)
 
     def id = column[Option[Long]]("id", O.PrimaryKey)
 
@@ -81,6 +110,14 @@ class Users @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasD
     def nickname = column[Option[String]]("nickname")
 
     def password = column[String]("password")
+
+    def roles = column[String]("roles")
+
+    def firstName = column[String]("f_name")
+
+    def lastName = column[String]("l_name")
+
+    def phoneNumber = column[Option[String]]("phone")
   }
 
 }

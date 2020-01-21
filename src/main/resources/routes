@@ -27,17 +27,20 @@ GET     /noqueue/v1/reservations/:id                   controllers.ReservationCo
 PATCH  /noqueue/v1/reservations/:id                   controllers.ReservationController.patchReservation(id: Long)
 
 ## This is to create contacts in our page
-POST  /noqueue/v1/contacts                      controllers.ContactController.addContact
-GET   /noqueue/v1/contacts                      controllers.ContactController.listContacts
-OPTIONS   /noqueue/v1/contacts                      controllers.OptionsController.options
-OPTIONS   /noqueue/v1/contacts/:email                      controllers.OptionsController.optionsString(email: String)
-DELETE /noqueue/v1/contacts/:email                     controllers.ContactController.deleteContact(email: String)
+POST  /talachitas/v1/contacts                      controllers.ContactController.addContact
+GET   /talachitas/v1/contacts                      controllers.ContactController.listContacts
+OPTIONS   /talachitas/v1/contacts                      controllers.OptionsController.options
+OPTIONS   /talachitas/v1/contacts/:email                      controllers.OptionsController.optionsString(email: String)
+DELETE /talachitas/v1/contacts/:email                     controllers.ContactController.deleteContact(email: String)
 
-GET /noqueue/v1/contacts/ping                     controllers.ContactController.ping
+GET /talachitas/v1/contacts/ping                     controllers.ContactController.ping
 
-GET /noqueue/v1/token                          controllers.TokenController.provideToken
+#GET /talachitas/v1/token                          controllers.TokenController.provideToken
+#OPTIONS /talachitas/v1/token                          controllers.OptionsController.options
 
-GET /noqueue/v1/login/profile                   controllers.UserController.profile
+GET /talachitas/v1/login/profile                   controllers.UserController.profile
+
+POST /talachitas/v1/users                       controllers.UserController.addUser
 
 # Home page
 GET     /                           controllers.Application.index
