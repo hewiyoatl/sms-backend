@@ -1,6 +1,6 @@
 package auth
 
-import com.auth0.jwk.UrlJwkProvider
+//import com.auth0.jwk.UrlJwkProvider
 import javax.inject.Inject
 import pdi.jwt.{JwtAlgorithm, JwtBase64, JwtClaim, JwtJson}
 import play.api.Configuration
@@ -27,34 +27,36 @@ class AuthService @Inject()(config: Configuration) {
       (JwtBase64.decodeString(header), JwtBase64.decodeString(body), sig)
   }
   // Gets the JWK from the JWKS endpoint using the jwks-rsa library
-  private val getJwk = (token: String) =>
-    (splitToken andThen decodeElements) (token) flatMap {
-      case (header, _, _) =>
-        val jwtHeader = JwtJson.parseHeader(header) // extract the header
-      val jwkProvider = new UrlJwkProvider(s"https://$domain")
-
-        // Use jwkProvider to load the JWKS data and return the JWK
-        jwtHeader.keyId.map { k =>
-          Try(jwkProvider.get(k))
-        } getOrElse Failure(new Exception("Unable to retrieve kid"))
-    }
-  private val validateClaims = (claims: JwtClaim) =>
-    if (claims.isValid(issuer, audience)) {
-      Success(claims)
-    } else {
-      Failure(new Exception("The JWT did not pass validation"))
-    }
+//  private val getJwk = (token: String) =>
+//    (splitToken andThen decodeElements) (token) flatMap {
+//      case (header, _, _) =>
+//        val jwtHeader = JwtJson.parseHeader(header) // extract the header
+//      val jwkProvider = new UrlJwkProvider(s"https://$domain")
+//
+//        // Use jwkProvider to load the JWKS data and return the JWK
+//        jwtHeader.keyId.map { k =>
+//          Try(jwkProvider.get(k))
+//        } getOrElse Failure(new Exception("Unable to retrieve kid"))
+//    }
+  private val validateClaims = (claims: JwtClaim) => ???
+//    if (claims.isValid(issuer, audience)) {
+//      Success(claims)
+//    } else {
+//      Failure(new Exception("The JWT did not pass validation"))
+//    }
 
   // Validates a JWT and potentially returns the claims if the token was
   // successfully parsed and validated
-  def validateJwt(token: String): Try[JwtClaim] = for {
+  def validateJwt(token: String): Try[JwtClaim] = ???
 
-    jwk <- getJwk(token) // Get the secret key for this token
-
-    claims <- JwtJson.decode(token, jwk.getPublicKey, Seq(JwtAlgorithm.RS256)) // Decode the token using the secret key
-
-    _ <- validateClaims(claims) // validate the data stored inside the token
-  } yield claims
+//  for {
+//
+//    jwk <- getJwk(token) // Get the secret key for this token
+//
+//    claims <- JwtJson.decode(token, jwk.getPublicKey, Seq(JwtAlgorithm.RS256)) // Decode the token using the secret key
+//
+//    _ <- validateClaims(claims) // validate the data stored inside the token
+//  } yield claims
 
   // Your Auth0 audience, read from configuration
   private def audience = config.get[String]("auth0.audience")

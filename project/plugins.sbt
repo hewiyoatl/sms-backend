@@ -23,7 +23,7 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.1")
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.3")
 
 //jococo test
-addSbtPlugin("de.johoop" % "jacoco4sbt" % "2.1.6")
+//addSbtPlugin("de.johoop" % "jacoco4sbt" % "2.1.6")
 
 //sbt release
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.3")
@@ -35,11 +35,17 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.1.2")
 addSbtPlugin("no.arktekk.sbt" % "aether-deploy" % "0.13")
 
 // for war / publish but it is just required to build
-addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "1.0.0")
+//addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "1.0.0")
 
 // flyway plugin repo
-resolvers += "Flyway" at "https://flywaydb.org/repo"
+//resolvers += "Flyway" at "https://flywaydb.org/repo"
 
 // flyway plugin
-addSbtPlugin("org.flywaydb" % "flyway-sbt" % "4.0.3")
+//addSbtPlugin("org.flywaydb" % "flyway-sbt" % "4.0.3")
 
+
+////swagger
+//
+//resolvers += Resolver.bintrayIvyRepo("sohoffice", "sbt-plugins")
+//
+//addSbtPlugin("com.sohoffice" %% "sbt-descriptive-play-swagger" % "0.7.5")

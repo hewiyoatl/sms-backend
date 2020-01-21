@@ -4,7 +4,6 @@ import java.util
 import java.util.Map.Entry
 import javax.inject.Inject
 
-import io.swagger.annotations._
 import net.sf.ehcache._
 import play.api.Logger
 import play.api.cache.ehcache.CacheManagerProvider
@@ -16,37 +15,26 @@ import play.api.mvc._
   *
   * @param cacheManagerProvider
   */
-@Api(value = "/caches", protocols = "http, https", produces = "text/plain", consumes = "text/plain")
 class CacheController @Inject()(cc: ControllerComponents,
                                 cacheManagerProvider: CacheManagerProvider) extends AbstractController(cc) {
+
+  val logger: Logger = Logger(this.getClass())
+
   val PLAY_CACHE = "play"
 
   def cacheReference: Cache = cacheManagerProvider.get.getCache(PLAY_CACHE)
 
   def clear = cacheReference.removeAll
 
-  @ApiOperation(
-    nickname = "clearCache",
-    value = "Clears the mem cache",
-    httpMethod = "POST",
-    produces = "text/plain")
-  @ApiResponses(Array(
-    new ApiResponse(code = 200, message = "Cache clear successfully")))
   def clearCache = Action { request =>
-    Logger.info("Clear cache invoked")
+    logger.info("Clear cache invoked")
     clear
     Ok("Clear cache").as(ContentTypes.TEXT)
   }
 
-  @ApiOperation(
-    nickname = "listCache",
-    value = "List all the mem cache",
-    httpMethod = "GET")
-  @ApiResponses(Array(
-    new ApiResponse(code = 200, message = "List of Cache")))
   def listCache = Action { request =>
 
-    Logger.info("List cache invoked")
+    logger.info("List cache invoked")
     val output = listKeys
 
     Ok(output).as(ContentTypes.TEXT)

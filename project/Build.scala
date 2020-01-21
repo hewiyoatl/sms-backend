@@ -1,16 +1,12 @@
-package com.rocketlawyer
+package com.talachitas
 package sbtcore
 
+//import com.earldouglas.xwp.XwpPlugin._
+//import de.johoop.jacoco4sbt.JacocoPlugin._
+import sbt.Keys._
 import sbt._
-import sbt.plugins._
-import Keys._
-
-import de.johoop.jacoco4sbt.JacocoPlugin._
-
+import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import sbtrelease.ReleasePlugin.autoImport._
-import ReleaseTransformations._
-
-import com.earldouglas.xwp.XwpPlugin._
 
 //import Dependencies._
 
@@ -35,27 +31,27 @@ object Testing extends BasicPlugin() {
   ) ++ addCommandAlias("integrationTest", "it:test")
 }
 
-object Coverage extends BasicPlugin(jacoco.settings, Testing)(
-  (classDirectory in Compile) := {
-    val prev = (classDirectory in Compile).value
-    prev.getParentFile / "covered-classes"
-  }
-  //libraryDependencies += jacocoAgent
-)
+//object Coverage extends BasicPlugin(jacoco.settings, Testing)(
+//  (classDirectory in Compile) := {
+//    val prev = (classDirectory in Compile).value
+//    prev.getParentFile / "covered-classes"
+//  }
+//  //libraryDependencies += jacocoAgent
+//)
 
 object NamePreservation extends BasicPlugin(
   moduleName := name.value // sbt, don't change my names
 )
 
 object Repos extends BasicPlugin(bintray.Plugin.bintrayResolverSettings)() {
-  val internalReleases = "Internal Releases" at "http://f1tst-linbld100/nexus/content/repositories/releases"
-  val internalSnapshots = "Internal Snapshots" at "http://f1tst-linbld100/nexus/content/repositories/snapshots"
-  val thirdParty = "Third Party Artifacts" at "http://f1tst-linbld100/nexus/content/repositories/thirdparty"
+//  val internalReleases = "Internal Releases" at "http://f1tst-linbld100/nexus/content/repositories/releases"
+//  val internalSnapshots = "Internal Snapshots" at "http://f1tst-linbld100/nexus/content/repositories/snapshots"
+//  val thirdParty = "Third Party Artifacts" at "http://f1tst-linbld100/nexus/content/repositories/thirdparty"
   override val customizations = Seq(
     resolvers ++= Seq( // note: sbt boots with some resolvers
-      internalReleases,
-      internalSnapshots,
-      thirdParty,
+//      internalReleases,
+//      internalSnapshots,
+//      thirdParty,
       "Sonatype Releases" at "http://oss.sonatype.org/content/repositories/releases",
       "Sonatype Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
       "jcenter" at "http://oss.jfrog.org/artifactory/oss-release-local/"
@@ -64,10 +60,10 @@ object Repos extends BasicPlugin(bintray.Plugin.bintrayResolverSettings)() {
 }
 
 object Publication extends BasicPlugin(aether.Aether.aetherPublishSettings)(
-  publishTo := {
-    if (isSnapshot.value) Some(Repos.internalSnapshots)
-    else Some(Repos.internalReleases)
-  },
+//  publishTo := {
+//    if (isSnapshot.value) Some(Repos.internalSnapshots)
+//    else Some(Repos.internalReleases)
+//  },
   publishMavenStyle := true,
   publishArtifact := true,
   publishArtifact in (Compile, packageBin) := true,
@@ -101,15 +97,15 @@ object ScmHelpers extends BasicPlugin() {
     sealed trait RepoLocation
     case object Github extends RepoLocation
 
-    def rlRepo(location: RepoLocation, name: String) = scmInfo in ThisBuild := (location match {
-      case Github =>
-        Some(ScmInfo(
-          browseUrl = url(s"https://github.com/rocketlawyer/$name"),
-          connection = s"scm:git:https://github.com/rocketlawyer/$name.git",
-          devConnection = Some(s"scm:git:git@github.com:rocketlawyer/$name.git")
-        ))
-      case _ => sys.error(s"Unknown repo location for $name ($location)")
-    })
+//    def rlRepo(location: RepoLocation, name: String) = scmInfo in ThisBuild := (location match {
+//      case Github =>
+//        Some(ScmInfo(
+//          browseUrl = url(s"https://github.com/rocketlawyer/$name"),
+//          connection = s"scm:git:https://github.com/rocketlawyer/$name.git",
+//          devConnection = Some(s"scm:git:git@github.com:rocketlawyer/$name.git")
+//        ))
+//      case _ => sys.error(s"Unknown repo location for $name ($location)")
+//    })
   }
 }
 
@@ -119,17 +115,17 @@ object SlimReleases extends BasicPlugin(
 )
 
 object Release extends BasicPlugin(sbtrelease.ReleasePlugin)() {
-  val jacocoTest: ReleaseStep = ReleaseStep(
-    action = { st: State =>
-      import de.johoop.jacoco4sbt.JacocoPlugin._
-      if (!st.get(ReleaseKeys.skipTests).getOrElse(false)) {
-        val extracted = Project.extract(st)
-        val ref = extracted.get(thisProjectRef)
-        extracted.runAggregated(jacoco.check in jacoco.Config in ref, st)
-      } else st
-    },
-    enableCrossBuild = false
-  )
+//  val jacocoTest: ReleaseStep = ReleaseStep(
+//    action = { st: State =>
+//      import de.johoop.jacoco4sbt.JacocoPlugin._
+//      if (!st.get(ReleaseKeys.skipTests).getOrElse(false)) {
+//        val extracted = Project.extract(st)
+//        val ref = extracted.get(thisProjectRef)
+//        extracted.runAggregated(jacoco.check in jacoco.Config in ref, st)
+//      } else st
+//    },
+//    enableCrossBuild = false
+//  )
   override val customizations = Seq(
     releaseVcs := Some(new JenkinsAwareGit(baseDirectory.value)),
     releaseTagName := s"${name.value}-${version.value}",
@@ -152,7 +148,7 @@ object Release extends BasicPlugin(sbtrelease.ReleasePlugin)() {
       checkSnapshotDependencies,
       inquireVersions,
       runClean,
-      jacocoTest,
+      //jacocoTest,
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
@@ -166,7 +162,7 @@ object Release extends BasicPlugin(sbtrelease.ReleasePlugin)() {
 
 object OrganizationSettings extends BasicPlugin() {
   override val buildSettings = Seq(
-    organization := "com.rocketlawyer"
+    organization := "com.talachitas"
   )
 }
 
@@ -190,15 +186,15 @@ object Library extends ArchitypePlugin() {
   }
 }
 
-object Webapp extends ArchitypePlugin(tomcat())(
-  libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % Provided,
-  webInfClasses in webapp := true
-) {
-  object autoImport {
-    val ScalaWebapp = Webapp
-    val JavaWebapp = Webapp
-  }
-}
+//object Webapp extends ArchitypePlugin(tomcat())(
+//  libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0" % Provided,
+//  webInfClasses in webapp := true
+//) {
+//  object autoImport {
+//    val ScalaWebapp = Webapp
+//    val JavaWebapp = Webapp
+//  }
+//}
 
 object Runnable extends ArchitypePlugin() {
   object autoImport {

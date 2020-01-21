@@ -37,7 +37,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
     Future(Ok("Hello, Scala!"))
   }
 
-  def listContacts = authAction.async { implicit request =>
+  def listContacts = Action.async { implicit request =>
     contactss.listContacts map { contacts =>
 
       Ok(Json.toJson(contacts)).withHeaders(Util.headers: _*)
