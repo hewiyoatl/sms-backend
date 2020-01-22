@@ -1,6 +1,6 @@
 package controllers
 
-import auth.AuthUserAction
+import auth.{AuthAdminAction, AuthUserAction}
 import formatter._
 import javax.inject.Inject
 import models.{ContactTable, Contacts}
@@ -17,6 +17,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
                                  (implicit context: ExecutionContext,
                                   metrics: MetricsFacade,
                                   authUserAction: AuthUserAction,
+                                  authAdminAction: AuthAdminAction,
                                   config: Configuration,
                                   util: Util) extends AbstractController(cc) {
 
@@ -40,7 +41,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
     Future(Ok("Hello, Scala!"))
   }
 
-  def listContacts = authUserAction.async { implicit request =>
+  def listContacts = authAdminAction.async { implicit request =>
 
     contactss.listContacts map { contacts =>
 
@@ -106,7 +107,7 @@ class ContactController @Inject()(cc: ControllerComponents, contactss: Contacts)
     }
   }
 
-  def deleteContact(email: String) = authUserAction.async { implicit request =>
+  def deleteContact(email: String) = authAdminAction.async { implicit request =>
 
     contactss.deleteContact(email)
     Future(NoContent.withHeaders(util.headers: _*))

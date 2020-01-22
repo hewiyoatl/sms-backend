@@ -12,7 +12,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECNamedCurveSpec
 import org.joda.time.DateTime
 import pdi.jwt.{Jwt, JwtAlgorithm}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.db.Database
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.{JsObject, JsString, Json}
@@ -20,27 +20,17 @@ import play.api.mvc._
 
 class Util @Inject()(config: Configuration) {
 
+  val logger: Logger = Logger(this.getClass())
+
   /**
    * This variable is used to check the request param
    */
   val PRETTY = "pretty"
 
-  val CALLER_INFO: String = "caller-info"
-
-  val DOC_TEMPLATE_CONTEXT: String = "/docs"
-
-  val DOC_INTERVIEW_CONTEXT: String = "/doc-ins"
-
-  val DOC_HTML_GENERATOR_CONTEXT: String = "/doc-html"
-
   /**
    * Empty json
    */
   val EMPTY_JSON: String = "{}"
-
-  val basicUser = "info@talachitas.com"
-
-  val basicPassword = "Me gustan las chinas"
 
   val privateKey: PrivateKey = {
 
@@ -105,17 +95,6 @@ class Util @Inject()(config: Configuration) {
 
   def lines = scala.io.Source.fromFile("/opt/resources/play.properties").getLines().mkString
 
-  def identityHeaderHardCode(implicit request: RequestHeader): Option[String] = {
-    val apiHeader: String = s"""{"user":{"id":null,"accountMemberships":[]},"apiClient":null}"""
-    val user: Option[String] = Some(apiHeader)
-    user
-  }
-
-  def identityHeader(implicit request: RequestHeader): Option[String] = {
-    val user: Option[String] = request.headers.get(CALLER_INFO)
-    user
-  }
-
   case class URLParts(urlProtocol: String, urlHost: String, urlPort: Int, urlPath: String)
 
   def getUrlParts(url: String): URLParts = {
@@ -124,31 +103,15 @@ class Util @Inject()(config: Configuration) {
   }
 
   /**
-   * Expecting this string: path = /fr/fr/default.rl
-   * Sending back this string: /fr/fr/interview#/{interview uuid}
-   * @param path
-   * @return
-   */
-  def removeRLPart(countryCode: String,
-                   languageCode: String,
-                   path: String,
-                   interviewUuid: String,
-                   templateUuid: String,
-                   documentUuid: String): String = {
-    val countryCodeLowerCase: String = countryCode.toLowerCase
-    val languageCodeLowerCase: String = languageCode.toLowerCase
-    val list: List[String] = path.split("/").toList
-    if (list.size >= 2) {
-      val removeEmptyString =
-        if (list.headOption.getOrElse("") == "") {
-          list.drop(1)
-        } else {
-          list
-        }
-      val param1: String = removeEmptyString.headOption.getOrElse(countryCodeLowerCase)
-      val param2: String = removeEmptyString.tail.headOption.getOrElse(languageCodeLowerCase)
-      s"""/$param1/$param2/interview/#/$interviewUuid?id=$templateUuid&document=$documentUuid"""
-    } else s"""/$countryCodeLowerCase/$languageCodeLowerCase/interview/#/$interviewUuid?id=$templateUuid&document=$documentUuid"""
+    * value can be the password per see + a salt
+    *
+    * https://stackoverflow.com/questions/6840206/sha2-password-hashing-in-java
+    *
+    * @param value
+    * @return
+    */
+  def getSha256(value: String) : String = {
+    org.apache.commons.codec.digest.DigestUtils.sha256Hex(value)
   }
 
   def headers = List(
@@ -168,13 +131,16 @@ class Util @Inject()(config: Configuration) {
 
   def provideToken(user: UserOutbound): JsObject = {
 
-    val token = Jwt.encode(
-      s"""{"email":"${user.email.getOrElse("")}",
-         |"first_name":"${user.firstName.getOrElse("")}",
-         |"last_name":"${user.lastName.getOrElse("")}",
-         |"roles": ${user.roles.getOrElse(List())},
-         |"exp": ${(new DateTime()).plusSeconds(expiration).getMillis},
-         |"iat": ${System.currentTimeMillis()}}""".stripMargin,
+    val message =      s"""{"email":"${user.email.getOrElse("")}",
+                           |"first_name":"${user.firstName.getOrElse("")}",
+                           |"last_name":"${user.lastName.getOrElse("")}",
+                           |"roles": "${user.roles.getOrElse("")}",
+                           |"exp": ${(new DateTime()).plusSeconds(expiration).getMillis},
+                           |"iat": ${System.currentTimeMillis()}}""".stripMargin
+
+    logger.info("Message to encode " + message)
+
+    val token = Jwt.encode(message,
       privateKey,
       JwtAlgorithm.ES512)
 

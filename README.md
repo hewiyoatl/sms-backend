@@ -16,6 +16,9 @@
 
 ```  java -cp lib/hsqldb.jar org.hsqldb.util.DatabaseManagerSwing ```
 
+### connect to database
+``` ssh -N -L 8888:127.0.0.1:443 -i ~/Desktop/Talachitas/api.pem bitnami@44.231.75.206 ```
+
 #### Build Locally 
 ```sbt run -Dhttp.port=10002```
 
@@ -33,8 +36,8 @@ Open the `application.conf` and `routes` file and set your own configurations.
 
 #### Prerequisites
 - Scala 2.11
-- Play 2.5.4
-- Postgres 9.5
+- Play 2.7.2
+- Mysql 5.x
 - Kafka http://kafka.apache.org/downloads.html
 - kafka-manager (https://github.com/yahoo/kafka-manager)
 
