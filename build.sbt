@@ -68,6 +68,8 @@ def getConfig: com.typesafe.config.Config = {
   ConfigFactory.load(classLoader)
 }
 
+maintainer := "info@talachitas.com"
+
 //import com.github.sbtliquibase.SbtLiquibase
 
 //enablePlugins(SbtLiquibase)
@@ -123,11 +125,14 @@ assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   // Take last config file
   case PathList(ps @ _*) if ps.last endsWith ".conf" => MergeStrategy.last
+  case PathList(ps @ _*) if ps.last endsWith "module-info.class" => MergeStrategy.concat
   case PathList("reference-overrides.conf") => MergeStrategy.concat
   case PathList("org", "slf4j", xs @ _*) => MergeStrategy.last
   case PathList("com", "zaxxer", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", "log4j", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", "commons", "logging", xs @ _*) => MergeStrategy.discard
+//  case PathList("org", "joda", "joda-convert", xs @ _*) => MergeStrategy.concat
+//  case PathList("javax", "xml", "bind", "jaxb-api", xs @ _*) => MergeStrategy.concat
   case x if x.endsWith("io.netty.versions.properties") => MergeStrategy.first
   case x if x.endsWith("application.conf") => MergeStrategy.first
   case x if x.endsWith("spring.tooling") => MergeStrategy.first
