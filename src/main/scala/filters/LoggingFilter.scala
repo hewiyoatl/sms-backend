@@ -23,6 +23,9 @@ class LoggingFilter @Inject() (implicit ec: ExecutionContext) extends EssentialF
         val endTime = System.currentTimeMillis
         val requestTime = endTime - startTime
         logger.info(s"${requestHeader.contentType} ${requestHeader.headers} ${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
+
+        logger.info(s"${requestHeader.contentType} ${requestHeader.headers} ${requestHeader.method} ${requestHeader.uri} response results ${result.header.headers} ")
+
         result.withHeaders("Request-Time" -> requestTime.toString)
 
       }

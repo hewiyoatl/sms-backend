@@ -1,17 +1,9 @@
 package controllers
 
 
-import java.security.spec.{ECParameterSpec, ECPoint, ECPrivateKeySpec, ECPublicKeySpec}
-import java.security.{KeyFactory, PrivateKey, PublicKey}
-
-import auth.BasicAuthAction
 import javax.inject.Inject
 import models.Contacts
-import org.bouncycastle.jce.ECNamedCurveTable
-import org.bouncycastle.jce.spec.ECNamedCurveSpec
 import play.api.Configuration
-import play.api.http.HeaderNames
-import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import utilities.Util
@@ -25,20 +17,15 @@ class TokenController @Inject()(cc: ControllerComponents, contactss: Contacts)
                                 config: Configuration,
                                 util: Util) extends AbstractController(cc) {
 
-  private val WithBasicAuth = new BasicAuthAction(
-    cc,
-    util.basicUser,
-    util.basicPassword)
-
-  private def audience = config.get[String]("auth0.audience")
-
-  private def clientSecret = config.get[String]("auth0.clientSecret")
-
-  private def clientId = config.get[String]("auth0.clientId")
-
-  private def domain = config.get[String]("auth0.domain")
-
-  private def tokenUrl = s"https://$domain/oauth/token"
+//  private def audience = config.get[String]("auth0.audience")
+//
+//  private def clientSecret = config.get[String]("auth0.clientSecret")
+//
+//  private def clientId = config.get[String]("auth0.clientId")
+//
+//  private def domain = config.get[String]("auth0.domain")
+//
+//  private def tokenUrl = s"https://$domain/oauth/token"
 
 //  private def s = config.get[String]("auth.s")
 //  private def x = config.get[String]("auth.x")

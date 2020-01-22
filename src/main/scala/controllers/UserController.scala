@@ -21,9 +21,11 @@ class UserController @Inject()(cc: ControllerComponents, users: Users, config: C
 
     request.headers.get(HeaderNames.AUTHORIZATION) map { basicHeader =>
 
-      val (user, password) = util.decodeBasicAuth(basicHeader)
+      val (user, passwordPlain) = util.decodeBasicAuth(basicHeader)
 
-      users.retrieveUser(user, password) map { userOpt =>
+      //val password = util.getSha256(passwordPlain)
+
+      users.retrieveUser(user, passwordPlain) map { userOpt =>
         //todo: check type of user admin or regular user. and return token
 
         userOpt map { user =>

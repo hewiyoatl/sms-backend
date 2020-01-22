@@ -1,7 +1,7 @@
 package auth
 
-import java.security.spec.{ECParameterSpec, ECPoint, ECPrivateKeySpec, ECPublicKeySpec}
-import java.security.{KeyFactory, PrivateKey, PublicKey}
+import java.security.spec.{ECParameterSpec, ECPoint, ECPublicKeySpec}
+import java.security.{KeyFactory, PublicKey}
 
 import javax.inject.Inject
 import org.bouncycastle.jce.ECNamedCurveTable
@@ -70,8 +70,8 @@ class AuthService @Inject()(config: Configuration) {
   //    }
   private val validateAdminClaims = (claims: JwtClaim) => {
 
-    val isAdmin: Boolean = (Json.toJson(claims.content) \ "roles").asOpt[List[String]]
-      .map(_.contains("Admin")).getOrElse(false)
+    val roles: Option[String] = (Json.parse(claims.content) \ "roles").asOpt[String]
+    val isAdmin: Boolean = roles.map(_.contains("Admin")).getOrElse(false)
 
     if (claims.expiration.get > System.currentTimeMillis && isAdmin) {
 
@@ -85,8 +85,9 @@ class AuthService @Inject()(config: Configuration) {
 
   private val validateUserClaims = (claims: JwtClaim) => {
 
-    val isUser: Boolean = (Json.toJson(claims.content) \ "roles").asOpt[List[String]]
-      .map(_.contains("User")).getOrElse(false)
+    val roles: Option[String] = (Json.parse(claims.content) \ "roles").asOpt[String]
+
+    val isUser: Boolean = roles.map(_.contains("User")).getOrElse(false)
 
     if (claims.expiration.get > System.currentTimeMillis && isUser) {
 
