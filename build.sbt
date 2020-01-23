@@ -1,7 +1,7 @@
 import com.typesafe.config.ConfigFactory
 import scoverage.ScoverageKeys
 
-name := "no-waiting-backend"
+name := "sms-backend"
 
 lazy val root = (project in file(".")).settings(
   bashScriptExtraDefines ++= Seq(
