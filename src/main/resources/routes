@@ -1,0 +1,3 @@
+POST    /talachitas/sms/v1/messages            controllers.SmsController.sendMessage
+
+GET     /talachitas/sms/v1/messages            controllers.SmsController.receiveMessage

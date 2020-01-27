@@ -1,4 +1,9 @@
 import com.typesafe.config.ConfigFactory
+import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
+import play.sbt.PlayImport.PlayKeys
+import play.sbt.{PlayAkkaHttpServer, PlayLayoutPlugin, PlayNettyServer, PlayScala}
+import play.twirl.sbt.Import.TwirlKeys
+import sbtassembly.{MergeStrategy, PathList}
 import scoverage.ScoverageKeys
 
 name := "sms-backend"
@@ -10,7 +15,7 @@ lazy val root = (project in file(".")).settings(
   )).enablePlugins(PlayScala, PlayNettyServer).disablePlugins(PlayAkkaHttpServer)
 
 disablePlugins(PlayLayoutPlugin)
-PlayKeys.playMonitoredFiles ++= (sourceDirectories in(Compile, TwirlKeys.compileTemplates)).value
+//PlayKeys.playMonitoredFiles ++= (sourceDirectories in(Compile, TwirlKeys.compileTemplates)).value
 
 scalaVersion in ThisBuild := "2.11.8"
 //scalaVersion in ThisBuild := "2.13.1"
@@ -20,10 +25,6 @@ resolvers += "Play2war plugins release" at "http://repository-play-war.forge.clo
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases/"
 resolvers += "sonatype-releases" at "https://oss.sonatype.org/content/repositories/releases/"
 resolvers += Resolver.bintrayRepo("cakesolutions", "maven")
-
-//resolvers += "Rocketlawyer Snapshots" at "http://f1tst-linbld100/nexus/content/repositories/snapshots"
-//resolvers += "Rocketlawyer Releases" at "http://f1tst-linbld100/nexus/content/repositories/releases"
-//resolvers += "netty" at "https://mvnrepository.com/artifact/io.netty/netty-all"
 
 libraryDependencies ++= Seq(
   ws,
@@ -40,10 +41,7 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.34",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "4.0.2",
-  //"org.hsqldb" % "hsqldb" % "2.4.0",
   "com.pauldijou" %% "jwt-play" % "0.19.0")
-//  "com.pauldijou" %% "jwt-core" % "0.19.0",
-//  "com.auth0" % "jwks-rsa" % "0.6.1")
 
 //unmanagedResourceDirectories in Test <+= baseDirectory(_ / "target/web/public/test")
 
