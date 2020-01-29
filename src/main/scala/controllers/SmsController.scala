@@ -34,6 +34,66 @@ class SmsController @Inject()(cc: ControllerComponents,
 
   val client: NexmoClient = NexmoClient.builder.apiKey(NEXMO_API_KEY).apiSecret(NEXMO_API_SECRET).build
 
+  def message(messageTypeOpt: Option[Long], phoneNumberOpt: Option[String]): Future[Result] = {
+
+    phoneNumberOpt.map { phoneNumber =>
+
+      messageTypeOpt.map { messageTypeVal =>
+
+        val mTypeFut = messageType.retrieveMessage(messageTypeVal)
+
+        mTypeFut.flatMap { mTypeOpt =>
+
+          mTypeOpt.map { mType =>
+
+            val finalMessage = new TextMessage(FROM_NUMBER, phoneNumber, mType.description.getOrElse(DEFAULT_MESSAGE))
+
+            val response = client.getSmsClient.submitMessage(finalMessage)
+
+            val messageResponse = response.getMessages.get(0)
+
+            if (messageResponse.getStatus eq MessageStatus.OK) {
+
+              mes.add(MessageCase(
+                None,
+                Some(messageResponse.getId),
+                phoneNumberOpt,
+                None,
+                messageTypeOpt,
+                Option(messageResponse.getNetwork),
+                Some(FROM_NUMBER),
+                mType.keyword,
+                mType.status))
+
+              System.out.println("Message sent successfully.")
+              Future(Ok(s"""{"message_id": "${messageResponse.getId}"}"""))
+            }
+            else {
+
+              System.out.println("Message failed with error: " + response.getMessages.get(0).getErrorText)
+
+              Future(InternalServerError("There was a problem when sending the message"))
+            }
+
+          } getOrElse {
+
+            Future(InternalServerError(Json.toJson(Error(INTERNAL_SERVER_ERROR, "No matching message type"))))
+          }
+
+        }
+
+      } getOrElse {
+
+        Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "no message"))))
+      }
+
+    } getOrElse {
+
+      Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "no phone number"))))
+    }
+
+  }
+
   def sendMessage = Action.async { implicit request =>
 
     val jsonBodyOpt = request.body.asJson
@@ -41,63 +101,10 @@ class SmsController @Inject()(cc: ControllerComponents,
     jsonBodyOpt.map { json =>
 
       val messageTypeOpt = (json \ "message_type").asOpt[Long]
-//      val messageOpt = (json \ "message").asOpt[String]
+      //      val messageOpt = (json \ "message").asOpt[String]
       val phoneNumberOpt = (json \ "phone_number").asOpt[String]
 
-      phoneNumberOpt.map { phoneNumber =>
-
-        messageTypeOpt.map { messageTypeVal =>
-
-          val mTypeFut = messageType.retrieveMessage(messageTypeVal)
-
-          mTypeFut.flatMap { mTypeOpt =>
-
-            mTypeOpt.map { mType =>
-
-              val finalMessage = new TextMessage(FROM_NUMBER, phoneNumber, mType.description.getOrElse(DEFAULT_MESSAGE))
-
-              val response = client.getSmsClient.submitMessage(finalMessage)
-
-              val messageResponse = response.getMessages.get(0)
-
-              if (messageResponse.getStatus eq MessageStatus.OK) {
-
-                mes.add(MessageCase(
-                  None,
-                  Some(messageResponse.getId),
-                  phoneNumberOpt,
-                  None,
-                  messageTypeOpt,
-                  Option(messageResponse.getNetwork),
-                  Some(FROM_NUMBER)))
-
-                System.out.println("Message sent successfully.")
-                Future(Ok(s"""{"message_id": "${messageResponse.getId}"}"""))
-              }
-              else {
-
-                System.out.println("Message failed with error: " + response.getMessages.get(0).getErrorText)
-
-                Future(InternalServerError("There was a problem when sending the message"))
-              }
-
-            } getOrElse {
-
-              Future(InternalServerError(Json.toJson(Error(INTERNAL_SERVER_ERROR, "No matching message type"))))
-            }
-
-          }
-
-        } getOrElse {
-
-          Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "no message"))))
-        }
-
-      } getOrElse {
-
-        Future(BadRequest(Json.toJson(Error(BAD_REQUEST, "no phone number"))))
-      }
-
+      message(messageTypeOpt, phoneNumberOpt)
 
     } getOrElse {
 
@@ -108,14 +115,68 @@ class SmsController @Inject()(cc: ControllerComponents,
 
   def receiveMessage = Action.async { implicit request =>
 
-    val misdn =request.getQueryString("msisdn").getOrElse("No value")
+    val misdn = request.getQueryString("msisdn").getOrElse("No value")
     val messageId = request.getQueryString("messageId").getOrElse("No value")
-    val text = request.getQueryString("text").getOrElse("No value")
+    val text: String = request.getQueryString("text").getOrElse("No value")
     val typeVal = request.getQueryString("type").getOrElse("No value")
-    val keywork = request.getQueryString("keyword").getOrElse("No VAlue")
+    val keyword = request.getQueryString("keyword").getOrElse("No VAlue")
     val messageTimestamp = request.getQueryString("message-timestamp").getOrElse("no value")
 
-    Logger.info(s"@@@$misdn@@@ @@@$messageId@@@ @@@$text@@@ @@@$typeVal@@@ @@@$keywork@@@ @@@$messageTimestamp@@@")
+    val messageCaseFut = mes.retrieveMessage(misdn, keyword)
+
+    messageCaseFut.map { messageCaseOpt =>
+
+      messageCaseOpt.map { messageCase =>
+
+        Logger.debug(s"This is the message @@@${messageCase.messageId.getOrElse("kkconqueso")}@@@")
+
+        val userAnswer = text.replaceFirst(".*[ ]{1,}", "").trim.toLowerCase
+
+        (messageCase.keyword.getOrElse(""), messageCase.status.getOrElse(-1L)) match {
+
+          case ("TABLE", 1L) => {
+
+            userAnswer match {
+
+              case ua if(ua.contains("cancel")) => {
+
+                // code to cancel
+              }
+
+            }
+
+          }
+
+          case ("TABLE", 2L) => {
+
+            userAnswer match {
+
+              case ua if (ua.contains("cancel")) => {
+
+                message(Option(5), Option(misdn))
+              }
+
+              case "yes" => {
+
+                message(Option(4), Option(misdn))
+              }
+
+              case "no" => {
+
+                message(Option(5), Option(misdn))
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+    Logger.info(s"@@@$misdn@@@ @@@$messageId@@@ @@@$text@@@ @@@$typeVal@@@ @@@$keyword@@@ @@@$messageTimestamp@@@")
 
     Future(Ok(s"messageid @@@${messageId}@@@ @@@${text}@@@"))
 

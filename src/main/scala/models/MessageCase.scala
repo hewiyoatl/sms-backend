@@ -16,13 +16,15 @@ case class MessageCase(id: Option[Long],
                        createdTimestamp: Option[DateTime],
                        messageTypeId: Option[Long],
                        network: Option[String],
-                       fromPhoneNumber: Option[String])
+                       fromPhoneNumber: Option[String],
+                       keyword: Option[String],
+                       status: Option[Long])
 
-case class MessageOutbound(id: Option[Long],
-                           firstName: Option[String],
-                           lastName: Option[String],
-                           mobile: String,
-                           email: Option[String])
+//case class MessageOutbound(id: Option[Long],
+//                           firstName: Option[String],
+//                           lastName: Option[String],
+//                           mobile: String,
+//                           email: Option[String])
 
 class MessageTableDef(tag: Tag) extends Table[MessageCase](tag, Some("talachitas_sms"), "messages") {
 
@@ -33,7 +35,9 @@ class MessageTableDef(tag: Tag) extends Table[MessageCase](tag, Some("talachitas
     createdTimestamp,
     messageTypeId,
     network,
-    fromPhoneNumber) <> (MessageCase.tupled, MessageCase.unapply)
+    fromPhoneNumber,
+    keyword,
+    status) <> (MessageCase.tupled, MessageCase.unapply)
 
   def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
@@ -48,6 +52,10 @@ class MessageTableDef(tag: Tag) extends Table[MessageCase](tag, Some("talachitas
   def network = column[Option[String]]("network")
 
   def fromPhoneNumber = column[Option[String]]("from_phone_number")
+
+  def keyword = column[Option[String]]("keyword")
+
+  def status = column[Option[Long]]("status")
 }
 
 class Message @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
@@ -60,11 +68,18 @@ class Message @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends Ha
       ((messages returning messages.map(_.id)) += message).flatMap(newId =>
 
         messages.filter(u => u.id === newId).map(u =>
+          (
+            u.id,
+            u.messageId,
+            u.phoneNumber,
+            u.messageTypeId,
+            u.network,
+            u.fromPhoneNumber,
+            u.keyword,
+            u.status)).result.map(_.headOption.map {
 
-          (u.id, u.messageId, u.phoneNumber, u.messageTypeId, u.network, u.fromPhoneNumber)).result.map(_.headOption.map {
-
-          case (id, messageId, phoneNumber, messageTypeId, network, fromPhoneNumber) =>
-            MessageCase(id, messageId, phoneNumber, None, messageTypeId, network, fromPhoneNumber)
+          case (id, messageId, phoneNumber, messageTypeId, network, fromPhoneNumber, keyword, status) =>
+            MessageCase(id, messageId, phoneNumber, None, messageTypeId, network, fromPhoneNumber,keyword, status)
         })
 
       ).transactionally)
@@ -85,15 +100,45 @@ class Message @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends Ha
 //    )
 //  }
 
-//  def retrieveClient(id: Long): Future[Option[MessageTypeOutbound]] = {
-//    db.run(messages.filter(u => u.id === id && u.deleted === false).map(
-//      u => (u.id, u.firstName, u.lastName, u.mobile, u.email)).result.map(
-//      _.headOption.map {
-//        case (id, firstName, lastName, mobile, email) =>
-//          MessageTypeOutbound(id, firstName, lastName, mobile, email)
-//      }
-//    ))
-//  }
+  def retrieveMessage(toPhone: String, keyword: String): Future[Option[MessageCase]] = {
+
+    db.run(messages.filter(incomingMessage =>
+
+      incomingMessage.phoneNumber.getOrElse("") === toPhone &&
+        incomingMessage.keyword.getOrElse("") === keyword.toUpperCase).map(m =>
+
+      (m.id,
+        m.messageId,
+        m.phoneNumber,
+        m.createdTimestamp,
+        m.messageTypeId,
+        m.network,
+        m.fromPhoneNumber,
+        m.keyword,
+        m.status)).sortBy(res => res._1.desc).result.map(_.headOption.map {
+
+      case (
+        id,
+        messageId,
+        phoneNumber,
+        createdTimestamp,
+        messageTypeId,
+        network,
+        fromPhoneNumber,
+        keyword,
+        status) =>
+        MessageCase(
+          id,
+          messageId,
+          phoneNumber,
+          createdTimestamp,
+          messageTypeId,
+          network,
+          fromPhoneNumber,
+          keyword,
+          status)
+    }).transactionally)
+  }
 
 //  def patchClient(client: MessageTypeCase): Future[Option[MessageTypeOutbound]] = {
 //

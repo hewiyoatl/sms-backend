@@ -38,10 +38,10 @@ addSbtPlugin("no.arktekk.sbt" % "aether-deploy" % "0.13")
 //addSbtPlugin("com.earldouglas" % "xsbt-web-plugin" % "1.0.0")
 
 // flyway plugin repo
-//resolvers += "Flyway" at "https://flywaydb.org/repo"
+resolvers += "Flyway" at "https://flywaydb.org/repo"
 
 // flyway plugin
-//addSbtPlugin("org.flywaydb" % "flyway-sbt" % "4.0.3")
+addSbtPlugin("org.flywaydb" % "flyway-sbt" % "4.0.3")
 
 
 ////swagger
