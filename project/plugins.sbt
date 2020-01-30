@@ -49,3 +49,5 @@ addSbtPlugin("org.flywaydb" % "flyway-sbt" % "4.0.3")
 //resolvers += Resolver.bintrayIvyRepo("sohoffice", "sbt-plugins")
 //
 //addSbtPlugin("com.sohoffice" %% "sbt-descriptive-play-swagger" % "0.7.5")
+
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.2")
