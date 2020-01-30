@@ -32,25 +32,25 @@ class Util @Inject()(config: Configuration) {
    */
   val EMPTY_JSON: String = "{}"
 
-  val privateKey: PrivateKey = {
-
-    val S = BigInt(s, 16)
-    val curveParams = ECNamedCurveTable.getParameterSpec("P-521")
-    val curveSpec: ECParameterSpec = new ECNamedCurveSpec(
-      "P-521",
-      curveParams.getCurve(),
-      curveParams.getG(),
-      curveParams.getN(),
-      curveParams.getH())
-
-    val privateSpec = new ECPrivateKeySpec(S.underlying(), curveSpec)
-    import java.security.Security
-    Security.addProvider(new BouncyCastleProvider)
-    val privateKeyEC = KeyFactory.getInstance("ECDSA", "BC").generatePrivate(privateSpec)
-
-    privateKeyEC
-
-  }
+//  val privateKey: PrivateKey = {
+//
+//    val S = BigInt(s, 16)
+//    val curveParams = ECNamedCurveTable.getParameterSpec("P-521")
+//    val curveSpec: ECParameterSpec = new ECNamedCurveSpec(
+//      "P-521",
+//      curveParams.getCurve(),
+//      curveParams.getG(),
+//      curveParams.getN(),
+//      curveParams.getH())
+//
+//    val privateSpec = new ECPrivateKeySpec(S.underlying(), curveSpec)
+//    import java.security.Security
+//    Security.addProvider(new BouncyCastleProvider)
+//    val privateKeyEC = KeyFactory.getInstance("ECDSA", "BC").generatePrivate(privateSpec)
+//
+//    privateKeyEC
+//
+//  }
 
   private def s = config.get[String]("auth.s")
 
@@ -129,28 +129,28 @@ class Util @Inject()(config: Configuration) {
     (user, password)
   }
 
-  def provideToken(user: UserOutbound): JsObject = {
-
-    val message =      s"""{"email":"${user.email.getOrElse("")}",
-                           |"first_name":"${user.firstName.getOrElse("")}",
-                           |"last_name":"${user.lastName.getOrElse("")}",
-                           |"roles": "${user.roles.getOrElse("")}",
-                           |"exp": ${(new DateTime()).plusSeconds(expiration).getMillis},
-                           |"iat": ${System.currentTimeMillis()}}""".stripMargin
-
-    logger.info("Message to encode " + message)
-
-    val token = Jwt.encode(message,
-      privateKey,
-      JwtAlgorithm.ES512)
-
-    Json.obj(
-      "email" -> user.email.map(JsString(_)),
-      "first_name" -> user.firstName.map(JsString(_)),
-      "last_name" -> user.lastName.map(JsString(_)),
-      "roles" -> Json.toJson(user.roles.map(x => x).getOrElse(List())),
-      "nickname" -> user.nickname.map(JsString(_)),
-      "bearer_token" -> token)
-
-  }
+//  def provideToken(user: UserOutbound): JsObject = {
+//
+//    val message =      s"""{"email":"${user.email.getOrElse("")}",
+//                           |"first_name":"${user.firstName.getOrElse("")}",
+//                           |"last_name":"${user.lastName.getOrElse("")}",
+//                           |"roles": "${user.roles.getOrElse("")}",
+//                           |"exp": ${(new DateTime()).plusSeconds(expiration).getMillis},
+//                           |"iat": ${System.currentTimeMillis()}}""".stripMargin
+//
+//    logger.info("Message to encode " + message)
+//
+//    val token = Jwt.encode(message,
+//      privateKey,
+//      JwtAlgorithm.ES512)
+//
+//    Json.obj(
+//      "email" -> user.email.map(JsString(_)),
+//      "first_name" -> user.firstName.map(JsString(_)),
+//      "last_name" -> user.lastName.map(JsString(_)),
+//      "roles" -> Json.toJson(user.roles.map(x => x).getOrElse(List())),
+//      "nickname" -> user.nickname.map(JsString(_)),
+//      "bearer_token" -> token)
+//
+//  }
 }

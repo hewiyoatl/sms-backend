@@ -94,7 +94,7 @@ class SmsController @Inject()(cc: ControllerComponents,
 
   }
 
-  def sendMessage = Action.async { implicit request =>
+  def sendMessage = authAction.async { implicit request =>
 
     val jsonBodyOpt = request.body.asJson
 

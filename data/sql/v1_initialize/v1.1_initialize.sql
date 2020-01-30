@@ -1,4 +1,4 @@
-CREATE DATABASE talachitas_sms;
+--CREATE DATABASE talachitas_sms;
 
 CREATE TABLE talachitas_sms.message_status(
 id BIGINT NOT NULL,

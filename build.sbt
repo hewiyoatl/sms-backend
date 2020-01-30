@@ -31,6 +31,7 @@ libraryDependencies ++= Seq(
   filters,
   guice,
   ehcache,
+  "com.google.crypto.tink" % "tink" % "1.3.0-rc3", //https://github.com/google/tink
   //metrics for database connections
   "nl.grons" %% "metrics-scala" % "3.5.4_a2.3",
   "com.kenshoo" %% "metrics-play" % "2.7.0_0.8.0",
@@ -157,11 +158,12 @@ assemblyMergeStrategy in assembly := {
   case PathList(ps @ _*) if ps.last endsWith "module-info.class" => MergeStrategy.concat
   case PathList("reference-overrides.conf") => MergeStrategy.concat
   case PathList("org", "slf4j", xs @ _*) => MergeStrategy.last
+  case PathList("javax", "activation", xs @ _*) => MergeStrategy.first
   case PathList("com", "zaxxer", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", "log4j", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", "commons", "logging", xs @ _*) => MergeStrategy.discard
-//  case PathList("org", "joda", "joda-convert", xs @ _*) => MergeStrategy.concat
-//  case PathList("javax", "xml", "bind", "jaxb-api", xs @ _*) => MergeStrategy.concat
+  // case PathList("org", "joda", "joda-convert", xs @ _*) => MergeStrategy.concat
+  // case PathList("javax", "xml", "bind", "jaxb-api", xs @ _*) => MergeStrategy.concat
   case x if x.endsWith("io.netty.versions.properties") => MergeStrategy.first
   case x if x.endsWith("application.conf") => MergeStrategy.first
   case x if x.endsWith("spring.tooling") => MergeStrategy.first

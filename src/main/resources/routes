@@ -1,3 +1,13 @@
 POST    /talachitas/sms/v1/messages            controllers.SmsController.sendMessage
 
 GET     /talachitas/sms/v1/messages            controllers.SmsController.receiveMessage
+
+
+### remember to escape only the ciphertext since it is base64 containing = characters
+### https://www.urlencoder.org/
+GET /talachitas/sms/v1/keys                         controllers.EncryptDecryptController.generateKeyFileAPI
+
+GET /talachitas/sms/v1/enc-des/:plaintext           controllers.EncryptDecryptController.encryptDecrypt(plaintext: String)
+
+GET /talachitas/sms/v1/encrypt/:plaintext           controllers.EncryptDecryptController.encrypt(plaintext: String)
+GET /talachitas/sms/v1/decrypt/:ciphertext          controllers.EncryptDecryptController.decrypt(ciphertext: String)

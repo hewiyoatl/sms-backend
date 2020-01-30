@@ -30,8 +30,10 @@ class MessageTypeTableDef(tag: Tag) extends Table[MessageTypeCase](tag, Some("ta
   def status = column[Option[Long]]("status")
 }
 
-class MessageType @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class MessageType @Inject()(val dbConfigProvider: DatabaseConfigProvider,
+                            customizedSlickConfig: CustomizedSlickConfig) extends HasDatabaseConfigProviderTalachitas[JdbcProfile] {
 
+  this.dbConfig = customizedSlickConfig.createDbConfigCustomized(dbConfigProvider)
   val messages = TableQuery[MessageTypeTableDef]
 
   def retrieveMessage(id: Long): Future[Option[MessageTypeCase]] = {

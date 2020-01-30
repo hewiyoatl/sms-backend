@@ -58,7 +58,10 @@ class MessageTableDef(tag: Tag) extends Table[MessageCase](tag, Some("talachitas
   def status = column[Option[Long]]("status")
 }
 
-class Message @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class Message @Inject()(val dbConfigProvider: DatabaseConfigProvider,
+                        customizedSlickConfig: CustomizedSlickConfig) extends HasDatabaseConfigProviderTalachitas[JdbcProfile] {
+
+  this.dbConfig = customizedSlickConfig.createDbConfigCustomized(dbConfigProvider)
 
   val messages = TableQuery[MessageTableDef]
 

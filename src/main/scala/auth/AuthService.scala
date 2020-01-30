@@ -10,14 +10,17 @@ import org.bouncycastle.jce.spec.ECNamedCurveSpec
 import pdi.jwt.{JwtAlgorithm, JwtBase64, JwtClaim, JwtJson}
 import play.api.Configuration
 import play.api.libs.json.Json
+import services.EncryptDecryptService
 
 import scala.util.{Failure, Success, Try}
 
-class AuthService @Inject()(config: Configuration) {
+class AuthService @Inject()(config: Configuration, encryptDecryptService: EncryptDecryptService) {
 
-  private def x = config.get[String]("auth.x")
+  private def x : String = encryptDecryptService.decrypt(config.get[String]("auth.x"))
 
-  private def y = config.get[String]("auth.y")
+  private def y = encryptDecryptService.decrypt(config.get[String]("auth.y"))
+
+  private def s = encryptDecryptService.decrypt(config.get[String]("auth.s"))
 
   val publicKey: PublicKey = {
 
