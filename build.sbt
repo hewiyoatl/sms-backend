@@ -40,6 +40,7 @@ libraryDependencies ++= Seq(
   "io.prometheus" % "simpleclient_servlet" % "0.0.16",
   "io.prometheus" % "simpleclient_pushgateway" % "0.0.16",
   "mysql" % "mysql-connector-java" % "5.1.34",
+  "com.nexmo" % "client" % "5.2.1",
   specs2 % Test,
   "com.typesafe.play" %% "play-slick" % "4.0.2",
   "com.pauldijou" %% "jwt-play" % "0.19.0")
@@ -162,6 +163,7 @@ assemblyMergeStrategy in assembly := {
   case PathList("com", "zaxxer", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", "log4j", xs @ _*) => MergeStrategy.last
   case PathList("org", "apache", "commons", "logging", xs @ _*) => MergeStrategy.discard
+  case PathList("io", "jsonwebtoken", xs @ _*) => MergeStrategy.last
   // case PathList("org", "joda", "joda-convert", xs @ _*) => MergeStrategy.concat
   // case PathList("javax", "xml", "bind", "jaxb-api", xs @ _*) => MergeStrategy.concat
   case x if x.endsWith("io.netty.versions.properties") => MergeStrategy.first
