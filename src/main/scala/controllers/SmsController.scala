@@ -23,6 +23,8 @@ class SmsController @Inject()(cc: ControllerComponents,
                               mes: Message)
                              (implicit context: ExecutionContext) extends AbstractController(cc) {
 
+  val logger: Logger = Logger(this.getClass())
+
   implicit val errorWriter = ErrorFormatter.errorWriter
 
   val DEFAULT_MESSAGE = "A MESSAGE HAS BEEN SENT"
@@ -128,7 +130,7 @@ class SmsController @Inject()(cc: ControllerComponents,
 
       messageCaseOpt.map { messageCase =>
 
-        Logger.debug(s"This is the message @@@${messageCase.messageId.getOrElse("kkconqueso")}@@@")
+        logger.debug(s"This is the message @@@${messageCase.messageId.getOrElse("kkconqueso")}@@@")
 
         val userAnswer = text.replaceFirst(".*[ ]{1,}", "").trim.toLowerCase
 
@@ -176,7 +178,7 @@ class SmsController @Inject()(cc: ControllerComponents,
 
     }
 
-    Logger.info(s"@@@$misdn@@@ @@@$messageId@@@ @@@$text@@@ @@@$typeVal@@@ @@@$keyword@@@ @@@$messageTimestamp@@@")
+    logger.info(s"@@@$misdn@@@ @@@$messageId@@@ @@@$text@@@ @@@$typeVal@@@ @@@$keyword@@@ @@@$messageTimestamp@@@")
 
     Future(Ok(s"messageid @@@${messageId}@@@ @@@${text}@@@"))
 
