@@ -10,6 +10,7 @@ import models.{Message, MessageCase, MessageType}
 import play.api.libs.json.Json
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import services.EncryptDecryptService
 import utilities.Util
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,6 +21,7 @@ class SmsController @Inject()(cc: ControllerComponents,
                               util: Util,
                               authAction: AuthAction,
                               messageType: MessageType,
+                              encryptDecryptService: EncryptDecryptService,
                               mes: Message)
                              (implicit context: ExecutionContext) extends AbstractController(cc) {
 
@@ -29,8 +31,8 @@ class SmsController @Inject()(cc: ControllerComponents,
 
   val DEFAULT_MESSAGE = "A MESSAGE HAS BEEN SENT"
 
-  val NEXMO_API_KEY: String = config.getOptional[String]("nexmo.key").getOrElse("")
-  val NEXMO_API_SECRET: String = config.getOptional[String]("nexmo.secret").getOrElse("")
+  val NEXMO_API_KEY: String = encryptDecryptService.decrypt(config.get[String]("nexmo.key"))
+  val NEXMO_API_SECRET: String = encryptDecryptService.decrypt(config.get[String]("nexmo.secret"))
   val TO_NUMBER = "14155280256"
   val FROM_NUMBER = "14342330899"
 
