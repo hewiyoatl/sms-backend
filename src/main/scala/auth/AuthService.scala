@@ -66,14 +66,20 @@ class AuthService @Inject()(config: Configuration, encryptDecryptService: Encryp
   private val validateAdminClaims = (claims: JwtClaim) => {
 
     val roles: Option[String] = (Json.parse(claims.content) \ "roles").asOpt[String]
+
+    val isUser: Boolean = roles.map(_.contains("User")).getOrElse(false)
+
+    val isClient: Boolean = roles.map(_.contains("Client")).getOrElse(false)
+
     val isAdmin: Boolean = roles.map(_.contains("Admin")).getOrElse(false)
 
-    if (claims.expiration.get > System.currentTimeMillis && isAdmin) {
-
-      Success(claims)
-    }
-    else {
-
+    if (claims.expiration.get > System.currentTimeMillis) {
+      if (isUser || isClient || isAdmin) {
+        Success(claims)
+      } else {
+        Failure(new Exception("Unable to grant this operation for this, check your privileges"))
+      }
+    } else {
       Failure(new Exception("Token expired"))
     }
   }
